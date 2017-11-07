@@ -23,8 +23,9 @@ namespace OSWPF1
             saveFileDialog1.DefaultExt = ".txt";
             saveFileDialog1.ShowDialog();
             var filename = saveFileDialog1.FileName;
-            var lol = new MainFile();
-            lol.CreateFile(filename);
+            var lol = new FSHandler(filename);
+            lol.GetData(new FileDataStorage());
+           // lol.CreateFile(filename);
         }
     }
 }

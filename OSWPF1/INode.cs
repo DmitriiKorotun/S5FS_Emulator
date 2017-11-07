@@ -22,7 +22,7 @@ namespace OSWPF1
             set { creationDate = value; }
         }
 
-        struct flags
+        public struct flags
         {
             bool system;
             public bool System
@@ -44,6 +44,13 @@ namespace OSWPF1
                 get { return type; }
                 set { type = value; }
             }
+        }
+
+        flags flag;
+        public flags Flag
+        {
+            get { return flag; }
+            set { flag = value; }
         }
 
         int size;
@@ -79,6 +86,15 @@ namespace OSWPF1
         {
             get { return rights; }
             set { rights = value; }
-        }    
+        }
+
+        short[] di_addr;
+        public short[] Di_addr
+        {
+            get { if (di_addr == null)
+                    di_addr = new short[13];
+                 return di_addr; }
+            set { di_addr = value; }
+        }
     }
 }
