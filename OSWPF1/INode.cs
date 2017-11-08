@@ -53,6 +53,12 @@ namespace OSWPF1
             set { flag = value; }
         }
 
+        int offset;
+        public int Offset
+        {
+            get { return 55; } //x17 short + x1 int + x3(4) bool + x2 long; 55?
+        }
+
         int size;
         public int Size
         {

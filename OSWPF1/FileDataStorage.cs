@@ -20,10 +20,17 @@ namespace OSWPF1
             get { return bitmap; }
         }
 
+        INodeMap iNodeMap;
+        public INodeMap INodeMap
+        {
+            get { return INodeMap; }
+        }
+
         public FileDataStorage()
         {
             superblock = new Superblock();
             bitmap = new Bitmap();
+            iNodeMap = new INodeMap();
         }
     }
 }

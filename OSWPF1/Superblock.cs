@@ -15,6 +15,12 @@ namespace OSWPF1
             set { fsType = value; }
         }
 
+        int offset;
+        public int Offset
+        {
+            get { return 14; } // x5 short + x1 int
+        }
+
         short clusterSize;
         public short ClusterSize
         {
