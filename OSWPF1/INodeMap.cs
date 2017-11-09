@@ -8,10 +8,10 @@ namespace OSWPF1
 {
     class INodeMap
     {
-        int offset;
-        public int Offset
+        int usedBlock;
+        public int UsedBlock
         {
-            get { return 3200; } //x1600 short
+            get { return 1; } //x1600 short
         }
 
         short[] nodeAdress;

@@ -8,3 +8,4 @@ C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.csproj.Gener
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.csproj.CoreCompileInputs.cache
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.exe
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.pdb
+C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.AddFile.resources

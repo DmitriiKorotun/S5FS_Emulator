@@ -8,10 +8,10 @@ namespace OSWPF1
 {
     class Bitmap
     {
-        int offset;
-        public int Offset
+        int usedBlock;
+        public int UsedBlock
         {
-            get { return 1600; } //x1600 byte
+            get { return 1; } 
         }
 
         byte[] bitmapValue;
