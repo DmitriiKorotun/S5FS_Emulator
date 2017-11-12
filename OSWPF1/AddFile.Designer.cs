@@ -104,9 +104,24 @@
             // num_size
             // 
             this.num_size.Location = new System.Drawing.Point(172, 118);
+            this.num_size.Maximum = new decimal(new int[] {
+            60000,
+            0,
+            0,
+            0});
+            this.num_size.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.num_size.Name = "num_size";
             this.num_size.Size = new System.Drawing.Size(84, 20);
             this.num_size.TabIndex = 6;
+            this.num_size.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // lbl_size
             // 

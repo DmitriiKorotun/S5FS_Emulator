@@ -52,6 +52,8 @@
       <DependentUpon>AddFile.cs</DependentUpon>
     </Compile>
     <Compile Include="Bitmap.cs" />
+    <Compile Include="ByteConverter.cs" />
+    <Compile Include="DataExtractor.cs" />
     <Compile Include="FileDataStorage.cs" />
     <Compile Include="FSHandler.cs" />
     <Compile Include="IniHandler.cs" />
