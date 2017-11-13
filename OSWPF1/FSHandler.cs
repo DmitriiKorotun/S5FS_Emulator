@@ -175,62 +175,14 @@ namespace OSWPF1
             return true;
         }
 
-        //Number of blocks used to store only file data (without blocks addresses)
-        private int BlocksForFile(Superblock superblock, int filesize)
-        {
-            return (int)Math.Ceiling((double)filesize / superblock.ClusterSize);
-        }
 
-        //Returnes short arr with blocks addresses
-        private short[] GetBlocksArr(Bitmap bitmap, int blockNum)
-        {
-            var blockList = new List<short>() ;
-            short index = 0;
 
-            while (blockList.Count < blockNum && index < bitmap.BitmapValue.Length)
-            {
-                if (bitmap.BitmapValue[index] == 0)
-                    blockList.Add(index);
-                ++index;
-            }
-
-            if (index == bitmap.BitmapValue.Length && blockList.Count < blockNum) //Checks if FS has enough size to write the file
-                throw new OutOfMemoryException();
-
-            short[] blocksArr = new short[blockNum];
-            for (int i = 0; i < blockNum; ++i)
-                blocksArr[i] = blockList[i];
-
-            return blocksArr;
-        }
-
-        // Returnes num of blocks needed to write the file
-        private int GetBlocksNum(int blocksNum, Superblock superblock)
-        {
-            int blocksNeeded = 0;
-            if (blocksNum <= 13) // 13 is length of di_addr[] array
-            {
-                blocksNeeded = blocksNum;
-            }
-            else
-            {
-                int blockCapacity = superblock.ClusterSize / 2; //How many adresses of short type can be stored in one block
-                blocksNeeded = blocksNum + (int)Math.Ceiling((double)blocksNum / blockCapacity); //Need to be edited cause can use one unnecessary block
-                //blocksNeeded = blocks used to store fileData + blocks used to store blocks adresses
-            }
-            return blocksNeeded;
-        }
-
-        //Writes the file data + blocks addresses to short[]
-        //I dont use real file data. Instead I just fill the blocks for file data with '1'
-        //You can change 'filesize' to 'filedata'
-        private void WriteFileData(short[] freeBlocks)
-        {
-        }
 
         public void AddFile(INode iNode)
         {
             WriteFile(DataExtractor.GetData(Path), iNode); 
         }
+
+        private void WWrieFil
     }
 }

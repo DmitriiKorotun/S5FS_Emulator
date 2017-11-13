@@ -1,0 +1,1 @@
+1. Remove all FileStream parameters. Instead, all methods should return byte[] and on method with FileStream should write it
