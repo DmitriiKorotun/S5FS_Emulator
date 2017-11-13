@@ -13,6 +13,7 @@ namespace OSWPF1
             SetPath(filepath);
         }
 
+        // Path to the FS file
         string path;
         public string Path
         {
@@ -39,6 +40,8 @@ namespace OSWPF1
             Path = path;
         }
 
+        //It creates the FS file and wrytes the superblock info to this file
+        //After that it will fill the rest of the file with '0'
         void CreateMainFile(string filepath)
         {
             using (Logger.GetInstance(path + ".log"))
@@ -71,7 +74,7 @@ namespace OSWPF1
                     fs.Write(BitConverter.GetBytes(superblock.FreeBlock), 0, BitConverter.GetBytes(superblock.FreeBlock).Length);
                     fs.Write(BitConverter.GetBytes(superblock.FreeINode), 0, BitConverter.GetBytes(superblock.FreeINode).Length);
 
-                    for (int i = 0; i < 62914560 - 16; ++i)
+                    for (int i = 0; i < 62914560 - 16; ++i) //16 is Superblock size
                         fs.WriteByte(0);
                 }
                 catch (Exception e)
@@ -88,78 +91,98 @@ namespace OSWPF1
             }
         }
 
-        void GetSuperblock(Superblock superblock, System.IO.FileStream fs)
+
+        //public void CreateUserGroup(long offset, System.IO.FileStream fs)
+        //{
+        //    fs.Seek(offset, System.IO.SeekOrigin.Begin);
+        //    fs.Write()
+        //}
+
+        private bool WriteFile(FileDataStorage storage, INode iNode)
         {
-            superblock.ClusterSize = ShortFromBytes(fs, 2);
-
-            byte[] fsType = new byte[4];
-            for (int i = 0; i < 4; ++i)
-                fsType[i] = (byte)fs.ReadByte();
-            superblock.FSType = BitConverter.ToInt32(fsType, 0);
-
-            byte[] iNodeCount = new byte[2];
-            for (int i = 0; i < 2; ++i)
-                iNodeCount[i] = (byte)fs.ReadByte();
-            superblock.INodeCount = BitConverter.ToInt16(iNodeCount, 0);
-
-            byte[] iNodeSize = new byte[2];
-            for (int i = 0; i < 2; ++i)
-                iNodeSize[i] = (byte)fs.ReadByte();
-            superblock.INodeSize = BitConverter.ToInt16(iNodeSize, 0);
-
-            byte[] freeBlock = new byte[2];
-            for (int i = 0; i < 2; ++i)
-                freeBlock[i] = (byte)fs.ReadByte();
-            superblock.FreeBlock = BitConverter.ToInt16(freeBlock, 0);
-
-            byte[] freeINode = new byte[2];
-            for (int i = 0; i < 2; ++i)
-                freeINode[i] = (byte)fs.ReadByte();
-            superblock.FreeINode = BitConverter.ToInt16(freeINode, 0);
-        }
-
-        short ShortFromBytes(System.IO.FileStream fs, int byteArrSize)
-        {
-            byte[] byteArr = new byte[byteArrSize];
-            for (int i = 0; i < byteArrSize; ++i)
-                byteArr[i] = (byte)fs.ReadByte();
-            return BitConverter.ToInt16(byteArr, 0);
-        }
-
-        int IntFromBytes(System.IO.FileStream fs, int byteArrSize)
-        {
-            byte[] byteArr = new byte[byteArrSize];
-            for (int i = 0; i < byteArrSize; ++i)
-                byteArr[i] = (byte)fs.ReadByte();
-            return BitConverter.ToInt32(byteArr, 0);
-        }
-
-        void GetBitmap(Bitmap bitmap, System.IO.FileStream fs)
-        {
-            for (int i = 0; i < bitmap.BitmapValue.Length; ++i)
-                bitmap.BitmapValue[i] = (byte)fs.ReadByte();
-        }
-
-        void GetINodeMap(INodeMap iNodeMap, System.IO.FileStream fs, Superblock superblock)
-        {
-            int count = 0, i = 0;
-            while (iNodeMap.NodeAdress[iNodeMap.NodeAdress.Length - 1] != 0 ||
-                count < superblock.INodeCount)
+            using (System.IO.FileStream fs = System.IO.File.OpenRead(Path),
+                temp = new System.IO.FileStream(fs.Name + ".temp", System.IO.FileMode.Create))
             {
-                byte iNode = (byte)fs.ReadByte();
-                if (iNode == 0)
+                int freeBlock = DataExtractor.GetFreeBlock(storage.Bitmap);
+                int nodeNum = DataExtractor.GetINode(storage, fs);
+                int i = 0;
+
+                while (i != (storage.Superblock.UsedBlock * storage.Superblock.ClusterSize + freeBlock - 1))
                 {
-                    iNodeMap.NodeAdress[i] = (short)count;
+                    temp.WriteByte((byte)fs.ReadByte());
                     ++i;
                 }
-                ++count;
+
+                temp.WriteByte(1);
+                fs.ReadByte();
+                ++i;
+
+                while (i != ((storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock) *
+                    storage.Superblock.ClusterSize + nodeNum - 1))
+                {
+                    temp.WriteByte((byte)fs.ReadByte());
+                    ++i;
+                }
+
+                temp.WriteByte(1);
+                fs.ReadByte();
+                ++i;
+
+                while (i != (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock +
+                    storage.INodeMap.UsedBlock) * storage.Superblock.ClusterSize + nodeNum - 1)
+                {
+                    temp.WriteByte((byte)fs.ReadByte());
+                    ++i;
+                }
+
+                temp.Write(BitConverter.GetBytes(iNode.Flag.System), 0, BitConverter.GetBytes(iNode.Flag.System).Length);
+                temp.Write(BitConverter.GetBytes(iNode.Flag.Hidden), 0, BitConverter.GetBytes(iNode.Flag.Hidden).Length);
+                temp.Write(BitConverter.GetBytes(iNode.Flag.Type), 0, BitConverter.GetBytes(iNode.Flag.Type).Length);
+                temp.WriteByte(0);
+                temp.Write(BitConverter.GetBytes(iNode.Size), 0, BitConverter.GetBytes(iNode.Size).Length);
+                temp.Write(BitConverter.GetBytes(iNode.UID), 0, BitConverter.GetBytes(iNode.UID).Length);
+                temp.Write(BitConverter.GetBytes(iNode.GID), 0, BitConverter.GetBytes(iNode.GID).Length);
+                temp.Write(BitConverter.GetBytes(iNode.CreationDate), 0, BitConverter.GetBytes(iNode.CreationDate).Length);
+                temp.Write(BitConverter.GetBytes(iNode.ChangeDate), 0, BitConverter.GetBytes(iNode.ChangeDate).Length);
+
+                for (int j = 0; j < iNode.Di_addr.Length; ++j)
+                    temp.Write(BitConverter.GetBytes(iNode.Di_addr[j]), 0, BitConverter.GetBytes(iNode.Di_addr[j]).Length);
+
+                fs.Seek(54, System.IO.SeekOrigin.Current);
+                i += 54;
+
+                while (i != (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock +
+                    storage.INodeMap.UsedBlock + storage.INodeBlocks) * storage.Superblock.ClusterSize - 1)
+                {
+                    temp.WriteByte((byte)fs.ReadByte());
+                    ++i;
+                }
+
+                byte[] arr = new byte[iNode.Size];
+                for (int j = 0; j < arr.Length; ++j)
+                    arr[j] = 1;
+
+                temp.Write(arr, 0, arr.Length);
+                fs.Seek(arr.Length, System.IO.SeekOrigin.Current);
+                i += arr.Length;
+
+                while (i != 62914560)
+                {
+                    temp.WriteByte((byte)fs.ReadByte());
+                    ++i;
+                }
             }
+            return true;
         }
 
-        public void GetData(FileDataStorage storage)
+
+
+
+        public void AddFile(INode iNode)
         {
-            var fs = System.IO.File.OpenRead(Path);
-            GetSuperblock(storage.Superblock, fs);
+            WriteFile(DataExtractor.GetData(Path), iNode); 
         }
+
+        private void WWrieFil
     }
 }

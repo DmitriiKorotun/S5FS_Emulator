@@ -23,7 +23,13 @@ namespace OSWPF1
         INodeMap iNodeMap;
         public INodeMap INodeMap
         {
-            get { return INodeMap; }
+            get { return iNodeMap; }
+        }
+
+        int iNodeBlocks;
+        public int INodeBlocks
+        {
+            get { return 205; }
         }
 
         public FileDataStorage()

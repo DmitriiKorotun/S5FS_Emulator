@@ -8,6 +8,11 @@ namespace OSWPF1
 {
     class INode
     {
+        public INode()
+        {
+            flag = new Flags();
+        }
+
         long changeDate;
         public long ChangeDate
         {
@@ -22,7 +27,7 @@ namespace OSWPF1
             set { creationDate = value; }
         }
 
-        public struct flags
+        public class Flags
         {
             bool system;
             public bool System
@@ -46,8 +51,8 @@ namespace OSWPF1
             }
         }
 
-        flags flag;
-        public flags Flag
+        Flags flag;
+        public Flags Flag
         {
             get { return flag; }
             set { flag = value; }
