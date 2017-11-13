@@ -22,7 +22,7 @@ namespace OSWPF1
             get
             {
                 if (bitmapValue == null)
-                    bitmapValue = new byte[1600];
+                    bitmapValue = new byte[1920];
                 return bitmapValue;
             }
             set { bitmapValue = value; }

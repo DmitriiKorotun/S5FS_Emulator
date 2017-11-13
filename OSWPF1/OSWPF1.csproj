@@ -73,7 +73,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Superblock.cs" />
-    <Compile Include="SuperblockWriter.cs" />
+    <Compile Include="DataWriter.cs" />
     <Compile Include="UserGroupData.cs" />
     <EmbeddedResource Include="AddFile.resx">
       <DependentUpon>AddFile.cs</DependentUpon>

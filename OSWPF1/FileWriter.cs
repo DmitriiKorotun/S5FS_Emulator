@@ -10,9 +10,10 @@ namespace OSWPF1
     {
         //Returnes Dictionary with pair: block address - byte arr
         //I dont use real file data. Instead I just fill the blocks for file data with '1'
-        private Dictionary<int, byte[]> GetDataArr(short[] freeBlocks, int addressBlocks, int blockSize)
+        public static Dictionary<int, byte[]> GetDataArr(short[] freeBlocks, int blockSize)
         {
             var dataToWrite = new Dictionary<int, byte[]>();
+            var addressBlocks = BlocksHandler.BlocksForAddress(freeBlocks.Length, blockSize);
             for (int i = 0; i < addressBlocks; ++i)
             {
                 var data = new byte[blockSize];
