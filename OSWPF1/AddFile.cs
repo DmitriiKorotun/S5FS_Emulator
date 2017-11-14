@@ -32,7 +32,7 @@ namespace OSWPF1
             iNode.Flag.Hidden = chb_hidden.Checked;
             iNode.Flag.System = chb_system.Checked;
             iNode.Flag.Type = chb_dir.Checked;
-            iNode.Size = (int)num_size.Value;
+            iNode.Size = (int)num_size.Value * 1024;
             iNode.GID = 1;
             iNode.UID = 1;
             iNode.Rights = 198;

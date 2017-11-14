@@ -93,12 +93,12 @@ namespace OSWPF1
 
         private long GetBlockEnd(int blockSize, long position)
         {
-            long blockEndAddr = position;
-            while (blockEndAddr % blockSize != 0)
-            {
-                ++blockEndAddr;
-            }
-            return blockEndAddr;
+            long blockEndAddr = position, remDiv = blockEndAddr % blockSize, diff = blockSize - remDiv;
+            //while (blockEndAddr % blockSize != 0)
+            //{
+            //    ++blockEndAddr;
+            //}
+            return blockEndAddr + diff;
         }
 
 
@@ -114,31 +114,46 @@ namespace OSWPF1
                 temp = new System.IO.FileStream(fs.Name + ".temp", System.IO.FileMode.Create))
             {
                 temp.SetLength(62914560);
-                int freeBlock = DataExtractor.GetFreeBlock(storage.Bitmap), nodeNum = DataExtractor.GetINode(storage, fs);
+                int freeBlock = DataExtractor.GetFreeBlock(storage.Bitmap), nodeNum = DataExtractor.GetINodeNum(storage.INodeMap);
 
                 DataWriter.WriteSuperblock(temp, storage.Superblock);
                 DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd(storage.Superblock.ClusterSize, temp.Position));
                 var blocks = BlocksHandler.GetBlocksArr(storage.Bitmap, iNode.Size, storage.Superblock.ClusterSize);
 
+                for (int i = 0; i < blocks.Length; ++i)
+                {
+                    storage.Bitmap.BitmapValue = BitWorker.TurnBitOn(storage.Bitmap.BitmapValue, blocks[i]);
+                }
                 //Here will be work with Bitmap
 
                 DataWriter.WriteBitmap(temp, storage.Bitmap);
-                DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd(storage.Superblock.ClusterSize, temp.Position));
+                DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((storage.Superblock.UsedBlock +
+                    storage.Bitmap.UsedBlock) * storage.Superblock.ClusterSize, temp.Position));
 
                 //Here will be work with iNodeMap
+                storage.INodeMap.BitmapValue = BitWorker.TurnBitOn(storage.INodeMap.BitmapValue, nodeNum);
 
-                DataWriter.WriteINodeMap(temp, storage.INodeMap);
-                DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd(storage.Superblock.ClusterSize, temp.Position));
+                //DataWriter.WriteINodeMap(temp, storage.INodeMap);
+                DataWriter.WriteBitmap(temp, storage.INodeMap);
+                DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((storage.Superblock.UsedBlock +
+                    storage.Bitmap.UsedBlock + storage.INodeMap.UsedBlock) * storage.Superblock.ClusterSize, temp.Position));
 
+                var dataDict = FileWriter.GetDataArr(blocks, storage.Superblock.ClusterSize);
+                List<int> dataKeys = new List<int>(dataDict.Keys);
+
+                for (int index = 0; index < iNode.Di_addr.Length && index < dataDict.Count; ++index)
+                {
+                    iNode.Di_addr[index] = (short)dataKeys[index]; //To change short for int cause data can be lost
+                }
                 long bytesNum = (nodeNum - 1) * 54; //How many bytes method need to skip
+                //To change: make size dynamic
                 DataWriter.CopyBytes(fs, temp, temp.Position, bytesNum);
                 DataWriter.WriteINode(temp, iNode);
                 DataWriter.CopyData(fs, temp, temp.Position, (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock +
                     storage.INodeMap.UsedBlock + storage.INodeBlocks) * storage.Superblock.ClusterSize - 1);
 
 
-                var dataDict = FileWriter.GetDataArr(blocks, storage.Superblock.ClusterSize);
-                List<int> dataKeys = new List<int>(dataDict.Keys);
+
                 for (int i = 0; i < storage.Bitmap.BitmapValue.Length * 8; ++i)
                 {
                     if (dataKeys.Contains(i))

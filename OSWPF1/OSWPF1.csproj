@@ -52,6 +52,7 @@
       <DependentUpon>AddFile.cs</DependentUpon>
     </Compile>
     <Compile Include="Bitmap.cs" />
+    <Compile Include="BitWorker.cs" />
     <Compile Include="BlocksHandler.cs" />
     <Compile Include="ByteConverter.cs" />
     <Compile Include="DataExtractor.cs" />
@@ -66,7 +67,6 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="INodeMap.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainFile.cs" />
     <Compile Include="OSException.cs" />

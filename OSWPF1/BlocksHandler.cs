@@ -19,24 +19,33 @@ namespace OSWPF1
         public static short[] GetBlocksArr(Bitmap bitmap, int filesize, int blockSize)
         {
             var blockNum = GetBlocksNum(BlocksForFile(blockSize, filesize), blockSize);
-            var blockList = new List<short>();
-            short index = 0;
+            //var blockList = new List<short>();
+            //short index = 0;
 
-            while (blockList.Count < blockNum && index < bitmap.BitmapValue.Length)
-            {
-                if (bitmap.BitmapValue[index] == 0)
-                    blockList.Add((short)(index + 1));
-                ++index;
-            }
-
-            if (index == bitmap.BitmapValue.Length && blockList.Count < blockNum) //Checks if FS has enough size to write the file
+            if (bitmap.BitmapValue.Length * 8 < blockNum)
                 throw new OutOfMemoryException();
 
-            short[] blocksArr = new short[blockNum];
-            for (int i = 0; i < blockNum; ++i)
-                blocksArr[i] = blockList[i];
+            return BitWorker.GetFreeBits(bitmap.BitmapValue, blockNum);
 
-            return blocksArr;
+            //while (blockList.Count < blockNum && index < bitmap.BitmapValue.Length * 8)
+            //{
+            //    BitWorker.ReadByte
+            //    if (bitmap.BitmapValue[index] == 0)
+            //    {
+            //        blockList.Add((short)(index + 1));
+            //    }
+
+            //    ++index;
+            //}
+
+            //if (index == bitmap.BitmapValue.Length * 8 && blockList.Count < blockNum) //Checks if FS has enough size to write the file
+            //    throw new OutOfMemoryException();
+
+            //short[] blocksArr = new short[blockNum];
+            //for (int i = 0; i < blockNum; ++i)
+            //    blocksArr[i] = blockList[i];
+
+            //return blocksArr;
         }
 
         // Returnes num of blocks needed to write the file

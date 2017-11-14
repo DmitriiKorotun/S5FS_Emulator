@@ -30,16 +30,16 @@ namespace OSWPF1
             return bytesWritten;
         }
 
-        public static long WriteINodeMap(System.IO.FileStream fs, INodeMap nodeMap)
-        {
-            long bytesWritten = 0;
-            foreach (short iNode in nodeMap.NodeAdress)
-            {
-                fs.Write(BitConverter.GetBytes(iNode), 0, BitConverter.GetBytes(iNode).Length);
-                bytesWritten += 2;
-            }
-            return bytesWritten;
-        }
+        //public static long WriteINodeMap(System.IO.FileStream fs, INodeMap nodeMap)
+        //{
+        //    long bytesWritten = 0;
+        //    foreach (short iNode in nodeMap.NodeAdress)
+        //    {
+        //        fs.Write(BitConverter.GetBytes(iNode), 0, BitConverter.GetBytes(iNode).Length);
+        //        bytesWritten += 2;
+        //    }
+        //    return bytesWritten;
+        //}
 
         public static long WriteINodes(System.IO.FileStream fs, INode[] iNodes)
         {

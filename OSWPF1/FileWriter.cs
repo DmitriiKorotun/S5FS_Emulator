@@ -14,25 +14,79 @@ namespace OSWPF1
         {
             var dataToWrite = new Dictionary<int, byte[]>();
             var addressBlocks = BlocksHandler.BlocksForAddress(freeBlocks.Length, blockSize);
+            int blockIndex = 0;
+            if (addressBlocks > 13)
+                blockIndex = addressBlocks + 1; //blockIndex - current not addr block index
+            else
+                blockIndex = 
+
+            //Writes addresses into the following blocks
             for (int i = 0; i < addressBlocks; ++i)
             {
-                var data = new byte[blockSize];
-                var address = BitConverter.GetBytes(freeBlocks[addressBlocks + i]);
-                for (int j = 0; j < data.Length; j += 2)
+                var addrBlock = new byte[blockSize];
+                // freeBlocks.Length - addressBlocks + i was addressBlocks + i
+                for (int j = 0; j < addrBlock.Length && blockIndex < freeBlocks.Length; j += 2)
                 {
-                    data[j] = address[0];
-                    data[j + 1] = address[1];
+                    var address = BitConverter.GetBytes(freeBlocks[blockIndex]);
+
+                    addrBlock[j] = address[0];
+                    addrBlock[j + 1] = address[1];
+
+                    ++blockIndex;
                 }
-                dataToWrite.Add(i, data);
+                dataToWrite.Add(freeBlocks[i], addrBlock);
             }
+
+            //Writes data into the following blocks
             for (int i = addressBlocks; i < freeBlocks.Length; ++i)
             {
                 var data = new byte[blockSize];
                 for (int j = 0; j < data.Length; ++j)
                     data[j] = 1;
-                dataToWrite.Add(i, data);
+                dataToWrite.Add(freeBlocks[i], data);
             }
             return dataToWrite;
+        }
+
+        //It fills blocks with addresses and data
+        private void SortBlocks(short[] freeBlocks, int blockSize)
+        {
+            const int addr_size = 13; //This is size of di_addr
+            int blockCapacity = blockSize / 2;
+            var addressBlocks = BlocksHandler.BlocksForAddress(freeBlocks.Length, blockSize);
+            int depth = addressBlocks > 0 ? 1 : 0;
+
+            if (addressBlocks > addr_size && addressBlocks < addr_size * blockCapacity)
+                depth = 2;
+            else
+                throw new OutOfMemoryException();
+
+            if (depth == 2)
+            {
+                int first_lvl_offset = blockCapacity * blockCapacity; // It actually store too much
+                int second_lvl_offset = blockCapacity;
+                for (int i = 0; i < addr_size; ++i)
+                {
+
+                    if (depth > 0)
+                    {
+
+                    }
+                }
+            }
+            else if (depth == 1)
+            {
+                int first_lvl_offset = blockCapacity;
+                for (int i = 0; i < addressBlocks; ++i)
+                {
+                    for (int j = 0; j < blockCapacity; ++j)
+                    {
+                        freeBlocks[i * blockCapacity] 
+                    }
+                    
+                }
+            }
+            
         }
 
         private void WriteBlock(System.IO.FileStream fs, byte[] data)
