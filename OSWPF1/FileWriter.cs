@@ -15,10 +15,10 @@ namespace OSWPF1
             var dataToWrite = new Dictionary<int, byte[]>();
             var addressBlocks = BlocksHandler.BlocksForAddress(freeBlocks.Length, blockSize);
             int blockIndex = 0;
-            if (addressBlocks > 13)
-                blockIndex = addressBlocks + 1; //blockIndex - current not addr block index
-            else
-                blockIndex = 
+            //if (addressBlocks > 13)
+            //    blockIndex = addressBlocks + 1; //blockIndex - current not addr block index
+            //else
+            //    blockIndex = 
 
             //Writes addresses into the following blocks
             for (int i = 0; i < addressBlocks; ++i)
@@ -81,7 +81,7 @@ namespace OSWPF1
                 {
                     for (int j = 0; j < blockCapacity; ++j)
                     {
-                        freeBlocks[i * blockCapacity] 
+                        //freeBlocks[i * blockCapacity];
                     }
                     
                 }

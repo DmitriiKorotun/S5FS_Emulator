@@ -35,6 +35,7 @@ namespace OSWPF1
             }
             else
             {
+                Path = path; //TO REMOVE
                 CreateMainFile(path);
             }
             Path = path;
@@ -53,7 +54,7 @@ namespace OSWPF1
                     Logger.GetInstance(null).Log(DateTime.Now + " - MainFile was created with name: " + path
                         + Environment.NewLine);
 
-                    var iniHandler = new IniFiles.IniHandler(path + "_data.ini");
+                    var iniHandler = new IniFiles.IniHandler("data.ini");
                     Logger.GetInstance(null).Log(DateTime.Now + " - IniHandler was initialized with" +
                         " filename: " + path + "_data.ini" + Environment.NewLine);
 
@@ -74,7 +75,7 @@ namespace OSWPF1
                     fs.Write(BitConverter.GetBytes(superblock.FreeBlock), 0, BitConverter.GetBytes(superblock.FreeBlock).Length);
                     fs.Write(BitConverter.GetBytes(superblock.FreeINode), 0, BitConverter.GetBytes(superblock.FreeINode).Length);
 
-                    for (int i = 0; i < 62914560 - 16; ++i) //16 is Superblock size
+                    for (int i = 0; i < 63774720 - 14; ++i) //14 is superblock size
                         fs.WriteByte(0);
                 }
                 catch (Exception e)
@@ -113,11 +114,12 @@ namespace OSWPF1
             using (System.IO.FileStream fs = System.IO.File.OpenRead(Path),
                 temp = new System.IO.FileStream(fs.Name + ".temp", System.IO.FileMode.Create))
             {
-                temp.SetLength(62914560);
+                temp.SetLength(63774720);
                 int freeBlock = DataExtractor.GetFreeBlock(storage.Bitmap), nodeNum = DataExtractor.GetINodeNum(storage.INodeMap);
 
-                DataWriter.WriteSuperblock(temp, storage.Superblock);
-                DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd(storage.Superblock.ClusterSize, temp.Position));
+                ByteWriter.WriteSuperblock(temp, storage.Superblock);
+                ByteWriter.CopyData(fs, temp, temp.Position, 
+                    GetBlockEnd(storage.Superblock.ClusterSize, temp.Position), storage.Superblock.ClusterSize);
                 var blocks = BlocksHandler.GetBlocksArr(storage.Bitmap, iNode.Size, storage.Superblock.ClusterSize);
 
                 for (int i = 0; i < blocks.Length; ++i)
@@ -126,17 +128,18 @@ namespace OSWPF1
                 }
                 //Here will be work with Bitmap
 
-                DataWriter.WriteBitmap(temp, storage.Bitmap);
-                DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((storage.Superblock.UsedBlock +
-                    storage.Bitmap.UsedBlock) * storage.Superblock.ClusterSize, temp.Position));
+                ByteWriter.WriteBitmap(temp, storage.Bitmap);
+                ByteWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((storage.Superblock.UsedBlock +
+                    storage.Bitmap.UsedBlock) * storage.Superblock.ClusterSize, temp.Position), storage.Superblock.ClusterSize);
 
                 //Here will be work with iNodeMap
                 storage.INodeMap.BitmapValue = BitWorker.TurnBitOn(storage.INodeMap.BitmapValue, nodeNum);
 
                 //DataWriter.WriteINodeMap(temp, storage.INodeMap);
-                DataWriter.WriteBitmap(temp, storage.INodeMap);
-                DataWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((storage.Superblock.UsedBlock +
-                    storage.Bitmap.UsedBlock + storage.INodeMap.UsedBlock) * storage.Superblock.ClusterSize, temp.Position));
+                ByteWriter.WriteBitmap(temp, storage.INodeMap);
+                ByteWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((storage.Superblock.UsedBlock +
+                    storage.Bitmap.UsedBlock + storage.INodeMap.UsedBlock) * storage.Superblock.ClusterSize,
+                    temp.Position), storage.Superblock.ClusterSize);
 
                 var dataDict = FileWriter.GetDataArr(blocks, storage.Superblock.ClusterSize);
                 List<int> dataKeys = new List<int>(dataDict.Keys);
@@ -147,84 +150,33 @@ namespace OSWPF1
                 }
                 long bytesNum = (nodeNum - 1) * 54; //How many bytes method need to skip
                 //To change: make size dynamic
-                DataWriter.CopyBytes(fs, temp, temp.Position, bytesNum);
-                DataWriter.WriteINode(temp, iNode);
-                DataWriter.CopyData(fs, temp, temp.Position, (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock +
-                    storage.INodeMap.UsedBlock + storage.INodeBlocks) * storage.Superblock.ClusterSize - 1);
 
-
+                ByteWriter.CopyBytes(fs, temp, temp.Position, bytesNum, storage.Superblock.ClusterSize);
+                ByteWriter.WriteINode(temp, iNode);
+                ByteWriter.CopyData(fs, temp, temp.Position, (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock +
+                    storage.INodeMap.UsedBlock + storage.INodeBlocks) *
+                    storage.Superblock.ClusterSize - 1, storage.Superblock.ClusterSize);
 
                 for (int i = 0; i < storage.Bitmap.BitmapValue.Length * 8; ++i)
                 {
                     if (dataKeys.Contains(i))
                     {
-                        DataWriter.WriteBlock(temp, storage.Superblock.ClusterSize, dataDict[i]);
+                        ByteWriter.WriteBlock(temp, storage.Superblock.ClusterSize, dataDict[i]);
                     }
                     else
                     {
-                        DataWriter.CopyBytes(fs, temp, temp.Position, storage.Superblock.ClusterSize);
+                        ByteWriter.CopyBytes(fs, temp, temp.Position, 
+                            storage.Superblock.ClusterSize, storage.Superblock.ClusterSize);
                     }
                 }
                 return true;
             }
         }
 
-
-        // fs.Seek(blocks.Length, System.IO.SeekOrigin.Current);
-        // SuperblockWriter.CopyBytes(fs, temp, temp.Position, 1);
-
-
-
-        //    DataWriter.CopyData(fs, temp, position, (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock) *
-        //        storage.Superblock.ClusterSize + nodeNum - 1);
-        //    position = (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock) *
-        //        storage.Superblock.ClusterSize + nodeNum - 1;
-
-        //    DataWriter.CopyBytes(fs, temp, position, 1);
-        //    ++position;
-
-        //    while (position != (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock +
-        //        storage.INodeMap.UsedBlock) * storage.Superblock.ClusterSize + nodeNum - 1)
-        //    {
-        //        temp.WriteByte((byte)fs.ReadByte());
-        //        ++position;
-        //    }
-
-        //    var iNodeArr = new INode[] {iNode };
-        //    DataWriter.WriteINodes(temp, iNodeArr);
-
-        //    fs.Seek(54, System.IO.SeekOrigin.Current);
-        //    position += 54;
-
-        //    while (position != (storage.Superblock.UsedBlock + storage.Bitmap.UsedBlock +
-        //        storage.INodeMap.UsedBlock + storage.INodeBlocks) * storage.Superblock.ClusterSize - 1)
-        //    {
-        //        temp.WriteByte((byte)fs.ReadByte());
-        //        ++position;
-        //    }
-
-        //    byte[] arr = new byte[iNode.Size];
-        //    for (int j = 0; j < arr.Length; ++j)
-        //        arr[j] = 1;
-
-        //    temp.Write(arr, 0, arr.Length);
-        //    fs.Seek(arr.Length, System.IO.SeekOrigin.Current);
-        //    position += arr.Length;
-
-        //    while (position != 62914560)
-        //    {
-        //        temp.WriteByte((byte)fs.ReadByte());
-        //        ++position;
-        //    }
-        //}
-        //return true;
-
-
-
-
         public void AddFile(INode iNode)
         {
             WriteFile(DataExtractor.GetData(Path), iNode);
         }
+
     }
 }

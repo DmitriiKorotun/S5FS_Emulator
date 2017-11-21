@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OSWPF1
 {
-    class DataWriter
+    class ByteWriter
     {
         public static long WriteSuperblock(System.IO.FileStream fs, Superblock superblock)
         {
@@ -84,83 +84,44 @@ namespace OSWPF1
             return bytesWritten;
         }
 
-        public static long WriteJunk(System.IO.FileStream fs, long numOfJunk)
+        //Need to revert to fs.WriteByte();
+        //Fills the file with fixed num of junk ('0') starting from the current position
+        //public static void WriteJunk(System.IO.FileStream fs, long numOfJunk) //Should return num of bytes that have been written
+        //{
+        //    var byteArr = new byte[numOfJunk]; //Add condition for "numOfJunk too big"
+        //    try
+        //    {
+        //            fs.Write(byteArr, 0, byteArr.Length);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.GetInstance("").Log(e.Message + Environment.NewLine);
+        //        throw e;
+        //    }
+        //}
+
+        //Need to revert to fs.WriteByte();
+        //Fills the file with fixed num of junk ('0') starting from the offset
+        //public static void WriteJunk(System.IO.FileStream fs, long numOfJunk, long offset) //Should return num of bytes that have been written
+        //{
+        //    //Add condition for "fs.position < offset"
+        //    var byteArr = new byte[numOfJunk]; //Add condition for "numOfJunk too big"
+        //    try
+        //    {
+        //        fs.Position = offset;
+        //        fs.Write(byteArr, 0, byteArr.Length);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.GetInstance("").Log(e.Message + Environment.NewLine);
+        //        throw e;
+        //    }
+        //}
+
+        //Copies all the remaining data starting from the offset
+        public static long CopyData(System.IO.FileStream fs1, System.IO.FileStream fs2, long offset, int blockSize) //Should return num of bytes that have been written
         {
             long bytesWritten = 0;
-            try
-            {
-                if (numOfJunk > 62914560)
-                    throw new OutOfMemoryException();
-                for (long i = 0; i < numOfJunk; ++i)
-                {
-                    fs.WriteByte(0);
-                    ++bytesWritten;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.GetInstance("").Log(e.Message + Environment.NewLine);
-                throw e;
-            }
-            return bytesWritten;
-        }
-
-        //Fills the file with fixed num of junk ('0') startin from the offset
-        public static long WriteJunk(System.IO.FileStream fs, long numOfJunk, long offset)
-        {
-            long bytesWritten = 0;
-            try
-            {
-                if (numOfJunk > 62914560 - offset)
-                    throw new OutOfMemoryException();
-
-                fs.Seek(offset, System.IO.SeekOrigin.Begin);
-
-                for (long i = 0; i < numOfJunk; ++i)
-                {
-                    fs.WriteByte(0);
-                    ++bytesWritten;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.GetInstance("").Log(e.Message + Environment.NewLine);
-                throw e;
-            }
-            return bytesWritten;
-        }
-
-        //Copies all the renaining data starting from the offset
-        public static long CopyData(System.IO.FileStream fs1, System.IO.FileStream fs2, long offset)
-        {
-            long bytesWritten = 0, poisition = offset;
-            try
-            {
-                if (offset > fs1.Length) //TO change
-                    throw new IndexOutOfRangeException();
-
-                fs1.Seek(offset, System.IO.SeekOrigin.Begin);
-                fs2.Seek(offset, System.IO.SeekOrigin.Begin);
-
-                while (poisition < fs1.Length)
-                {
-                    fs2.WriteByte((byte)fs1.ReadByte());
-                    ++poisition;
-                    ++bytesWritten;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.GetInstance("").Log(e.Message + Environment.NewLine);
-                throw e;
-            }
-            return bytesWritten;
-        }
-
-        //Copies fixed amount of bytes starting from offset
-        public static long CopyBytes(System.IO.FileStream fs1, System.IO.FileStream fs2, long offset, long bytesToCopy)
-        {
-            long bytesWritten = 0, poisition = offset;
             try
             {
                 if (offset > fs1.Length) //TO change
@@ -168,15 +129,49 @@ namespace OSWPF1
 
                 fs1.Position = offset;
                 fs2.Position = offset;
-                // fs1.Seek(offset, System.IO.SeekOrigin.Begin);
-                // fs2.Seek(offset, System.IO.SeekOrigin.Begin);
 
-                while (poisition < fs1.Length && bytesWritten < bytesToCopy)
+                while (fs1.Length - fs1.Position >= blockSize)
                 {
-                    fs2.WriteByte((byte)fs1.ReadByte());
-                    ++poisition;
-                    ++bytesWritten;
+                    var block = ByteReader.ReadBlock(fs1, blockSize);
+                    fs2.Write(block, 0, block.Length);
+                    bytesWritten += block.Length;
                 }
+
+                var lastBytes = ByteReader.ReadBytes(fs1, fs1.Length - fs1.Position);
+                fs2.Write(lastBytes, 0, lastBytes.Length);
+                bytesWritten += lastBytes.Length;
+            }
+            catch (Exception e)
+            {
+                Logger.GetInstance("").Log(e.Message + Environment.NewLine);
+                throw e;
+            }
+
+            return bytesWritten;
+        }
+
+        //Copies fixed amount of bytes starting from offset
+        public static long CopyBytes(System.IO.FileStream fs1, System.IO.FileStream fs2, long offset, long bytesToCopy, int blockSize)
+        {
+            long bytesWritten = 0;
+            try
+            {
+                if (offset > fs1.Length) //TO change
+                    throw new IndexOutOfRangeException();
+
+                fs1.Position = offset;
+                fs2.Position = offset;
+
+                while (bytesToCopy - bytesWritten >= blockSize)
+                {
+                    var block = ByteReader.ReadBlock(fs1, blockSize);
+                    fs2.Write(block, 0, block.Length);
+                    bytesWritten += block.Length;
+                }
+
+                var lastBytes = ByteReader.ReadBytes(fs1, bytesToCopy - bytesWritten);
+                fs2.Write(lastBytes, 0, lastBytes.Length);
+                bytesWritten += lastBytes.Length;
             }
             catch (Exception e)
             {
@@ -186,18 +181,23 @@ namespace OSWPF1
             return bytesWritten;
         }
 
-        //Copies fixed amount of bytes starting from offset
-        public static long CopyBytes(System.IO.FileStream fs1, System.IO.FileStream fs2, long bytesToCopy)
+
+        //Copies fixed amount of bytes starting from fs1 current position
+        public static long CopyBytes(System.IO.FileStream fs1, System.IO.FileStream fs2, long bytesToCopy, int blockSize)
         {
-            long bytesWritten = 0, position = fs1.Position;
+            long bytesWritten = 0;
             try
             {
-                while (position < fs1.Length && bytesWritten < bytesToCopy)
+                while (bytesToCopy - bytesWritten >= blockSize)
                 {
-                    fs2.WriteByte((byte)fs1.ReadByte());
-                    ++position;
-                    ++bytesWritten;
+                    var block = ByteReader.ReadBlock(fs1, blockSize);
+                    fs2.Write(block, 0, block.Length);
+                    bytesWritten += block.Length;
                 }
+
+                var lastBytes = ByteReader.ReadBytes(fs1, bytesToCopy - bytesWritten);
+                fs2.Write(lastBytes, 0, lastBytes.Length);
+                bytesWritten += lastBytes.Length;
             }
             catch (Exception e)
             {
@@ -208,56 +208,47 @@ namespace OSWPF1
         }
 
         //Copies bytes from start pos to end pos to another file
-        public static long CopyData(System.IO.FileStream fs1, System.IO.FileStream fs2, long startPos, long endPos)
+        public static long CopyData(System.IO.FileStream fs1, System.IO.FileStream fs2, long startPos, long endPos, int blockSize)
         {
-            long bytesWritten = 0, poisition = startPos;
-            try
-            {
-                if (startPos > fs1.Length) //TO change
-                    throw new IndexOutOfRangeException();
+            long bytesWritten = 0, bytesToWrite = endPos - startPos;
 
-                fs1.Position = startPos;
-                fs2.Position = startPos;
+            fs1.Position = startPos;
+            fs2.Position = startPos;
 
-                while (poisition < fs1.Length && poisition < endPos)
-                {
-                    fs2.WriteByte((byte)fs1.ReadByte());
-                    ++poisition;
-                    ++bytesWritten;
-                }
-            }
-            catch (Exception e)
+            while (bytesToWrite - bytesWritten >= blockSize)
             {
-                Logger.GetInstance("").Log(e.Message + Environment.NewLine);
-                throw e;
+                WriteBlock(fs2, blockSize, ByteReader.ReadBlock(fs1, blockSize));
+                bytesWritten += blockSize;
             }
+
+            var lastBytes = ByteReader.ReadBytes(fs1, bytesToWrite - bytesWritten);
+            fs2.Write(lastBytes, 0, lastBytes.Length);
+            bytesWritten += lastBytes.Length;
+
             return bytesWritten;
         }
 
+        //Writes block to the fs starting from fs position
         public static long WriteBlock(System.IO.FileStream fs, int blockSize, byte[] arr)
         {
             if (arr.Length != blockSize)
-                throw new ArgumentException();
+                throw new ArgumentException("Block size and arr size doesn't match");
 
             fs.Write(arr, 0, arr.Length);
-            //foreach (byte elem in arr)
-            //    fs.WriteByte(elem);
-
             return arr.Length;
         }
 
+        //Writes block to the fs starting from offset
         public static long WriteBlock(System.IO.FileStream fs, long offset, int blockSize, byte[] arr)
         {
             if (arr.Length != blockSize)
-                throw new ArgumentException();
+                throw new ArgumentException("Block size and arr size doesn't match");
 
             if (offset > fs.Length)
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Index of fs position is out of range");
 
-            fs.Seek(offset, System.IO.SeekOrigin.Begin);
-
-            foreach (byte elem in arr)
-                fs.WriteByte(elem);
+            fs.Position = offset;
+            fs.Write(arr, 0, arr.Length);
 
             return arr.Length;
         }
