@@ -41,6 +41,8 @@
             this.btn_exit = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.cbox_user = new System.Windows.Forms.ComboBox();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.lbl_progress = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.num_size)).BeginInit();
             this.SuspendLayout();
             // 
@@ -181,11 +183,30 @@
             this.cbox_user.Size = new System.Drawing.Size(100, 21);
             this.cbox_user.TabIndex = 12;
             // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(172, 179);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(100, 23);
+            this.progressBar.TabIndex = 13;
+            // 
+            // lbl_progress
+            // 
+            this.lbl_progress.AutoSize = true;
+            this.lbl_progress.Location = new System.Drawing.Point(12, 185);
+            this.lbl_progress.Name = "lbl_progress";
+            this.lbl_progress.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.lbl_progress.Size = new System.Drawing.Size(83, 13);
+            this.lbl_progress.TabIndex = 14;
+            this.lbl_progress.Text = "Пользователь:";
+            // 
             // AddFile
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.lbl_progress);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.cbox_user);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btn_exit);
@@ -222,5 +243,7 @@
         private System.Windows.Forms.Button btn_exit;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbox_user;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.Label lbl_progress;
     }
 }

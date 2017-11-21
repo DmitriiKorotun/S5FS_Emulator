@@ -9,36 +9,47 @@ namespace OSWPF1
     class BlocksHandler
     {
         //Number of blocks used to store only file data (without blocks addresses)
-        public static int BlocksForFile(int blockSize, int filesize)
+        static int BlocksForFile(int blockSize, int filesize)
         {
             return (int)Math.Ceiling((double)filesize / blockSize);
         }
 
         //Returnes short arr with blocks addresses
-        private short[] GetBlocksArr(Bitmap bitmap, int blockNum)
+        //Starts with 1
+        public static short[] GetBlocksArr(Bitmap bitmap, int filesize, int blockSize)
         {
-            var blockList = new List<short>();
-            short index = 0;
+            var blockNum = GetBlocksNum(BlocksForFile(blockSize, filesize), blockSize);
+            //var blockList = new List<short>();
+            //short index = 0;
 
-            while (blockList.Count < blockNum && index < bitmap.BitmapValue.Length)
-            {
-                if (bitmap.BitmapValue[index] == 0)
-                    blockList.Add(index);
-                ++index;
-            }
-
-            if (index == bitmap.BitmapValue.Length && blockList.Count < blockNum) //Checks if FS has enough size to write the file
+            if (bitmap.BitmapValue.Length * 8 < blockNum)
                 throw new OutOfMemoryException();
 
-            short[] blocksArr = new short[blockNum];
-            for (int i = 0; i < blockNum; ++i)
-                blocksArr[i] = blockList[i];
+            return BitWorker.GetFreeBits(bitmap.BitmapValue, blockNum);
 
-            return blocksArr;
+            //while (blockList.Count < blockNum && index < bitmap.BitmapValue.Length * 8)
+            //{
+            //    BitWorker.ReadByte
+            //    if (bitmap.BitmapValue[index] == 0)
+            //    {
+            //        blockList.Add((short)(index + 1));
+            //    }
+
+            //    ++index;
+            //}
+
+            //if (index == bitmap.BitmapValue.Length * 8 && blockList.Count < blockNum) //Checks if FS has enough size to write the file
+            //    throw new OutOfMemoryException();
+
+            //short[] blocksArr = new short[blockNum];
+            //for (int i = 0; i < blockNum; ++i)
+            //    blocksArr[i] = blockList[i];
+
+            //return blocksArr;
         }
 
         // Returnes num of blocks needed to write the file
-        private int GetBlocksNum(int blocksNum, int blockSize)
+        static int GetBlocksNum(int blocksNum, int blockSize)
         {
             int blocksNeeded = 0;
             if (blocksNum <= 13) // 13 is length of di_addr[] array
@@ -55,7 +66,7 @@ namespace OSWPF1
         }
 
         // Returnes num of blocks needed to write the addresses
-        private int BlocksForAddress(int blocksNum, int blockSize)
+        public static int BlocksForAddress(int blocksNum, int blockSize)
         {
             int blocksForAddress = 0;
             if (blocksNum > 13)

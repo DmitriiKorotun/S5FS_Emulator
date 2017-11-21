@@ -1,1 +1,4 @@
 1. Remove all FileStream parameters. Instead, all methods should return byte[] and on method with FileStream should write it
+2. Remove all static numbers and make them dynamic
+3. Change name of some methods in order to make them more clear
+4. Make file copy process faster

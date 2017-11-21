@@ -52,8 +52,10 @@
       <DependentUpon>AddFile.cs</DependentUpon>
     </Compile>
     <Compile Include="Bitmap.cs" />
+    <Compile Include="BitWorker.cs" />
     <Compile Include="BlocksHandler.cs" />
     <Compile Include="ByteConverter.cs" />
+    <Compile Include="ByteReader.cs" />
     <Compile Include="DataExtractor.cs" />
     <Compile Include="FileDataStorage.cs" />
     <Compile Include="FileWriter.cs" />
@@ -66,14 +68,13 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="INodeMap.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainFile.cs" />
     <Compile Include="OSException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Superblock.cs" />
-    <Compile Include="SuperblockWriter.cs" />
+    <Compile Include="ByteWriter.cs" />
     <Compile Include="UserGroupData.cs" />
     <EmbeddedResource Include="AddFile.resx">
       <DependentUpon>AddFile.cs</DependentUpon>

@@ -15,7 +15,7 @@ namespace OSWPF1
             superblock.INodeCount = ByteConverter.ShortFromBytes(fs, 2);
             superblock.INodeSize = ByteConverter.ShortFromBytes(fs, 2);
             superblock.FreeBlock = ByteConverter.ShortFromBytes(fs, 2);
-            superblock.FreeINode = ByteConverter.ShortFromBytes(fs, 2);
+            superblock.FreeINode = ByteConverter.ShortFromBytes(fs, 2); 
         }
 
         static void GetBitmap(Bitmap bitmap, System.IO.FileStream fs)
@@ -25,23 +25,23 @@ namespace OSWPF1
         }
 
         // It returnes INode map
-        static bool GetINodeMap(INodeMap iNodeMap, System.IO.FileStream fs, Superblock superblock)
-        {
-            int count = 0, i = 0;
-            while (iNodeMap.NodeAdress[iNodeMap.NodeAdress.Length - 1] != 0 &&
-                count < superblock.INodeCount)
-            {
-                byte iNode = (byte)fs.ReadByte();
-                if (iNode == 0)
-                {
-                    iNodeMap.NodeAdress[i] = (short)count;
-                    ++i;
-                }
-                ++count;
-            }
-            bool isNodeLeft = count < superblock.INodeCount ? true : false;
-            return isNodeLeft;
-        }
+        //static bool GetINodeMap(INodeMap iNodeMap, System.IO.FileStream fs, Superblock superblock)
+        //{
+        //    int count = 0, i = 0;
+        //    while (iNodeMap.NodeAdress[iNodeMap.NodeAdress.Length - 1] != 0 &&
+        //        count < superblock.INodeCount)
+        //    {
+        //        byte iNode = (byte)fs.ReadByte();
+        //        if (iNode == 0)
+        //        {
+        //            iNodeMap.NodeAdress[i] = (short)count;
+        //            ++i;
+        //        }
+        //        ++count;
+        //    }
+        //    bool isNodeLeft = count < superblock.INodeCount ? true : false;
+        //    return isNodeLeft;
+        //}
 
         internal static int GetFreeBlock(Bitmap blockMap)
         {
@@ -60,33 +60,25 @@ namespace OSWPF1
         }
 
         // It returns num of first free iNode
-        private static int GetINodeNum(INodeMap nodeMap)
+        internal static int GetINodeNum(Bitmap nodeMap)
         {
             int adress = -1;
-            for (int i = 0; i < nodeMap.NodeAdress.Length; ++i)
-            {
-                if (nodeMap.NodeAdress[i] == 0)
-                {
-                    nodeMap.NodeAdress[i] = 1;
-                    adress = i + 1;
-                    break;
-                }
-            }
+            adress = BitWorker.GetFirstFree(nodeMap.BitmapValue);
             return adress;
         }
 
         // It searches the iNode map and if map contain free iNode it will return num of this iNode
         // If map doesn't contain free iNode, GetINode() will try to get another map of iNodes
-        internal static int GetINode(FileDataStorage storage, System.IO.FileStream fs)
-        {
-            int num = GetINodeNum(storage.INodeMap);
-            if (num < 0)
-            {
-                GetINodeMap(storage.INodeMap, fs, storage.Superblock);
-                num = GetINodeNum(storage.INodeMap);
-            }
-            return num;
-        }
+        //internal static int GetINode(FileDataStorage storage, System.IO.FileStream fs)
+        //{
+        //    int num = GetINodeNum(storage.INodeMap);
+        //    if (num < 0)
+        //    {
+        //        GetINodeMap(storage.INodeMap, fs, storage.Superblock);
+        //        num = GetINodeNum(storage.INodeMap);
+        //    }
+        //    return num;
+        //}
 
         // It returnes main information about File System
         public static FileDataStorage GetData(string filepath)
@@ -98,8 +90,8 @@ namespace OSWPF1
                 fs.Seek(4096, System.IO.SeekOrigin.Begin); //Change offset to be dynamic
                 GetBitmap(storage.Bitmap, fs);
                 fs.Seek(4096 * 2, System.IO.SeekOrigin.Begin); //Change offset to be dynamic
-                GetINodeMap(storage.INodeMap, fs, storage.Superblock);
-                fs.Seek(4096 * 6, System.IO.SeekOrigin.Begin); //Change offset to be dynamic
+                GetBitmap(storage.INodeMap, fs);
+                fs.Seek(4096 * 3, System.IO.SeekOrigin.Begin); //Change offset to be dynamic
             }
             return storage;
         }
