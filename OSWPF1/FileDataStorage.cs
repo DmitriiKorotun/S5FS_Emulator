@@ -26,10 +26,9 @@ namespace OSWPF1
             get { return iNodeMap; }
         }
 
-        int iNodeBlocks;
-        public int INodeBlocks
+        public int NodeBlocksOffset
         {
-            get { return 207; }
+            get { return INode.Offset * 15360; } //Change to be dynamic
         }
 
         public FileDataStorage()

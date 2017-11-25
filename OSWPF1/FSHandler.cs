@@ -58,7 +58,7 @@ namespace OSWPF1
                         Logger.GetInstance(null).Log(DateTime.Now + " - IniHandler was initialized with" +
                             " filename: " + path + "_data.ini" + Environment.NewLine);
 
-                        SuperblockWriter.WriteSuperblock(fs, new Superblock(iniHandler));
+                        FSPartsWriter.WriteSuperblock(fs, new Superblock(iniHandler));
                         ByteWriter.WriteJunk(fs, 63774720 - Superblock.Offset); //14 is superblock size
                     }
                     catch (Exception e)
@@ -86,9 +86,10 @@ namespace OSWPF1
                 if (iNode.Size / 1024 > 8240)
                     throw new Exception("File size is too big");
                 temp.SetLength(63774720);
+
                 int nodeNum = DataExtractor.GetINodeNum(storage.INodeMap);
 
-                SuperblockWriter.WriteSuperblock(temp, storage.Superblock);
+                FSPartsWriter.WriteSuperblock(temp, storage.Superblock);
                 ByteWriter.CopyData(fs, temp, temp.Position, 
                     GetBlockEnd(storage.Superblock.ClusterSize, temp.Position), storage.Superblock.ClusterSize);
 
@@ -98,13 +99,13 @@ namespace OSWPF1
                     storage.Bitmap.BitmapValue = BitWorker.TurnBitOn(storage.Bitmap.BitmapValue, blocks[i]);
                 }
 
-                BitmapWriter.WriteBitmap(temp, storage.Bitmap);
+                FSPartsWriter.WriteBitmap(temp, storage.Bitmap);
                 ByteWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((Superblock.UsedBlock +
                     Bitmap.UsedBlock) * storage.Superblock.ClusterSize, temp.Position), storage.Superblock.ClusterSize);
 
                 storage.INodeMap.BitmapValue = BitWorker.TurnBitOn(storage.INodeMap.BitmapValue, nodeNum);
 
-                BitmapWriter.WriteBitmap(temp, storage.INodeMap);
+                FSPartsWriter.WriteBitmap(temp, storage.INodeMap);
                 ByteWriter.CopyData(fs, temp, temp.Position, GetBlockEnd((Superblock.UsedBlock +
                     Bitmap.UsedBlock + Bitmap.UsedBlock) * storage.Superblock.ClusterSize,
                     temp.Position), storage.Superblock.ClusterSize);
@@ -120,9 +121,9 @@ namespace OSWPF1
 
                 long bytesNum = (nodeNum - 1) * INode.Offset; //How many bytes method need to skip
                 ByteWriter.CopyBytes(fs, temp, temp.Position, bytesNum, storage.Superblock.ClusterSize);
-                ByteWriter.WriteINode(temp, iNode);
+                FSPartsWriter.WriteINode(temp, iNode);
                 ByteWriter.CopyData(fs, temp, temp.Position, (Superblock.UsedBlock + Bitmap.UsedBlock +
-                    Bitmap.UsedBlock + storage.INodeBlocks) *
+                    Bitmap.UsedBlock + storage.NodeBlocksOffset) *
                     storage.Superblock.ClusterSize - 1, storage.Superblock.ClusterSize);
 
                 for (int i = 0; i < storage.Bitmap.BitmapValue.Length * 8; ++i)
