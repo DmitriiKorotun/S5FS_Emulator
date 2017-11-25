@@ -36,7 +36,7 @@
             this.btn_addUser = new System.Windows.Forms.Button();
             this.btn_addGroup = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.tv_dirView = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
             // textBox1
@@ -107,19 +107,19 @@
             this.button3.Text = "Удалить файл";
             this.button3.UseVisualStyleBackColor = true;
             // 
-            // treeView1
+            // tv_dirView
             // 
-            this.treeView1.Location = new System.Drawing.Point(12, 104);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(121, 97);
-            this.treeView1.TabIndex = 7;
+            this.tv_dirView.Location = new System.Drawing.Point(278, 12);
+            this.tv_dirView.Name = "tv_dirView";
+            this.tv_dirView.Size = new System.Drawing.Size(195, 237);
+            this.tv_dirView.TabIndex = 7;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
-            this.Controls.Add(this.treeView1);
+            this.ClientSize = new System.Drawing.Size(485, 261);
+            this.Controls.Add(this.tv_dirView);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.btn_addGroup);
             this.Controls.Add(this.btn_addUser);
@@ -144,7 +144,7 @@
         private System.Windows.Forms.Button btn_addUser;
         private System.Windows.Forms.Button btn_addGroup;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TreeView tv_dirView;
     }
 }
 

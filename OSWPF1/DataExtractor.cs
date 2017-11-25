@@ -24,25 +24,6 @@ namespace OSWPF1
                 bitmap.BitmapValue[i] = (byte)fs.ReadByte();
         }
 
-        // It returnes INode map
-        //static bool GetINodeMap(INodeMap iNodeMap, System.IO.FileStream fs, Superblock superblock)
-        //{
-        //    int count = 0, i = 0;
-        //    while (iNodeMap.NodeAdress[iNodeMap.NodeAdress.Length - 1] != 0 &&
-        //        count < superblock.INodeCount)
-        //    {
-        //        byte iNode = (byte)fs.ReadByte();
-        //        if (iNode == 0)
-        //        {
-        //            iNodeMap.NodeAdress[i] = (short)count;
-        //            ++i;
-        //        }
-        //        ++count;
-        //    }
-        //    bool isNodeLeft = count < superblock.INodeCount ? true : false;
-        //    return isNodeLeft;
-        //}
-
         internal static int GetFreeBlock(Bitmap blockMap)
         {
             int i = 0, blockNum = -1;
@@ -66,19 +47,6 @@ namespace OSWPF1
             adress = BitWorker.GetFirstFree(nodeMap.BitmapValue);
             return adress;
         }
-
-        // It searches the iNode map and if map contain free iNode it will return num of this iNode
-        // If map doesn't contain free iNode, GetINode() will try to get another map of iNodes
-        //internal static int GetINode(FileDataStorage storage, System.IO.FileStream fs)
-        //{
-        //    int num = GetINodeNum(storage.INodeMap);
-        //    if (num < 0)
-        //    {
-        //        GetINodeMap(storage.INodeMap, fs, storage.Superblock);
-        //        num = GetINodeNum(storage.INodeMap);
-        //    }
-        //    return num;
-        //}
 
         // It returnes main information about File System
         public static FileDataStorage GetData(string filepath)

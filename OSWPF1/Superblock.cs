@@ -8,6 +8,22 @@ namespace OSWPF1
 {
     class Superblock
     {
+        public Superblock()
+        {
+
+        }
+
+        public Superblock(IniFiles.IniHandler dataFile)
+        {
+            this.ClusterSize = Convert.ToInt16(dataFile.ReadINI("Superblock", "BlockSize"));
+            byte[] ftype = Encoding.ASCII.GetBytes(dataFile.ReadINI("Superblock", "Name"));
+            this.FSType = BitConverter.ToInt32(ftype, 0);
+            this.INodeCount = Convert.ToInt16(dataFile.ReadINI("Superblock", "INodeCount"));
+            this.INodeSize = Convert.ToInt16(dataFile.ReadINI("Superblock", "INodeSize"));
+            this.FreeBlock = Convert.ToInt16(dataFile.ReadINI("Superblock", "FreeBlocksCount"));
+            this.FreeINode = Convert.ToInt16(dataFile.ReadINI("Superblock", "FreeINodeCount"));
+        }
+
         int fsType;
         public int FSType
         {
@@ -15,8 +31,15 @@ namespace OSWPF1
             set { fsType = value; }
         }
 
-        int usedBlock;
-        public int UsedBlock
+
+        static int offset;
+        public static int Offset
+        {
+            get { return 14; }
+        }
+
+        static int usedBlock;
+        public static int UsedBlock
         {
             get { return 1; } // x5 short + x1 int
         }

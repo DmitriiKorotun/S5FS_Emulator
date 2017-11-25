@@ -8,39 +8,6 @@ namespace OSWPF1
 {
     class ByteWriter
     {
-        public static long WriteSuperblock(System.IO.FileStream fs, Superblock superblock)
-        {
-            fs.Write(BitConverter.GetBytes(superblock.ClusterSize), 0, BitConverter.GetBytes(superblock.ClusterSize).Length);
-            fs.Write(BitConverter.GetBytes(superblock.FSType), 0, BitConverter.GetBytes(superblock.FSType).Length);
-            fs.Write(BitConverter.GetBytes(superblock.INodeCount), 0, BitConverter.GetBytes(superblock.INodeCount).Length);
-            fs.Write(BitConverter.GetBytes(superblock.INodeSize), 0, BitConverter.GetBytes(superblock.INodeSize).Length);
-            fs.Write(BitConverter.GetBytes(superblock.FreeBlock), 0, BitConverter.GetBytes(superblock.FreeBlock).Length);
-            fs.Write(BitConverter.GetBytes(superblock.FreeINode), 0, BitConverter.GetBytes(superblock.FreeINode).Length);
-            return fs.Position; //Returnes num of bytes that have been written
-        }
-
-        public static long WriteBitmap(System.IO.FileStream fs, Bitmap bitmap)
-        {
-            long bytesWritten = 0;
-            foreach (byte byteElem in bitmap.BitmapValue)
-            {
-                fs.WriteByte(byteElem);
-                ++bytesWritten;
-            }
-            return bytesWritten;
-        }
-
-        //public static long WriteINodeMap(System.IO.FileStream fs, INodeMap nodeMap)
-        //{
-        //    long bytesWritten = 0;
-        //    foreach (short iNode in nodeMap.NodeAdress)
-        //    {
-        //        fs.Write(BitConverter.GetBytes(iNode), 0, BitConverter.GetBytes(iNode).Length);
-        //        bytesWritten += 2;
-        //    }
-        //    return bytesWritten;
-        //}
-
         public static long WriteINodes(System.IO.FileStream fs, INode[] iNodes)
         {
             long bytesWritten = 0;
@@ -85,38 +52,38 @@ namespace OSWPF1
         }
 
         //Need to revert to fs.WriteByte();
-        //Fills the file with fixed num of junk ('0') starting from the current position
-        //public static void WriteJunk(System.IO.FileStream fs, long numOfJunk) //Should return num of bytes that have been written
-        //{
-        //    var byteArr = new byte[numOfJunk]; //Add condition for "numOfJunk too big"
-        //    try
-        //    {
-        //            fs.Write(byteArr, 0, byteArr.Length);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Logger.GetInstance("").Log(e.Message + Environment.NewLine);
-        //        throw e;
-        //    }
-        //}
+        //Fills the file with fixed num of junk('0') starting from the current position
+        public static void WriteJunk(System.IO.FileStream fs, long numOfJunk) //Should return num of bytes that have been written
+        {
+            try
+            {
+                for (long i = 0; i < numOfJunk; ++i)
+                    fs.WriteByte(0);
+            }
+            catch (Exception e)
+            {
+                Logger.GetInstance("").Log(e.Message + Environment.NewLine);
+                throw e;
+            }
+        }
 
         //Need to revert to fs.WriteByte();
         //Fills the file with fixed num of junk ('0') starting from the offset
-        //public static void WriteJunk(System.IO.FileStream fs, long numOfJunk, long offset) //Should return num of bytes that have been written
-        //{
-        //    //Add condition for "fs.position < offset"
-        //    var byteArr = new byte[numOfJunk]; //Add condition for "numOfJunk too big"
-        //    try
-        //    {
-        //        fs.Position = offset;
-        //        fs.Write(byteArr, 0, byteArr.Length);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Logger.GetInstance("").Log(e.Message + Environment.NewLine);
-        //        throw e;
-        //    }
-        //}
+        public static void WriteJunk(System.IO.FileStream fs, long numOfJunk, long offset) //Should return num of bytes that have been written
+        {
+            //Add condition for "fs.position < offset"
+            fs.Position = offset;
+            try
+            {
+                for (long i = 0; i < numOfJunk; ++i)
+                    fs.WriteByte(0);
+            }
+            catch (Exception e)
+            {
+                Logger.GetInstance("").Log(e.Message + Environment.NewLine);
+                throw e;
+            }
+        }
 
         //Copies all the remaining data starting from the offset
         public static long CopyData(System.IO.FileStream fs1, System.IO.FileStream fs2, long offset, int blockSize) //Should return num of bytes that have been written

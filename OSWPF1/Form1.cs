@@ -24,8 +24,6 @@ namespace OSWPF1
             saveFileDialog1.ShowDialog();
             var filename = saveFileDialog1.FileName;
             var lol = new FSHandler(filename);
-           // lol.GetData();
-           // lol.CreateFile(filename);
         }
 
         private void button1_Click(object sender, EventArgs e)
