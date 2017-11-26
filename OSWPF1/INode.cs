@@ -58,10 +58,10 @@ namespace OSWPF1
             set { flag = value; }
         }
 
-        int offset;
-        public int Offset
+        static int offset;
+        public static int Offset
         {
-            get { return 55; } //x17 short + x1 int + x3(4) bool + x2 long; 55?
+            get { return 54; } //x17 short + x1 int + x3(4) bool + x2 long; 55?
         }
 
         int size;
@@ -106,6 +106,18 @@ namespace OSWPF1
                     di_addr = new short[13];
                  return di_addr; }
             set { di_addr = value; }
+        }
+
+        string name;
+        public string Name
+        {
+            get { return name; }
+            set
+            {
+                if (value.Length > 16)
+                    throw new Exception("String is too big");
+                name = value;
+            }
         }
     }
 }

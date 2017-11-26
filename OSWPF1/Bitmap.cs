@@ -9,8 +9,8 @@ namespace OSWPF1
     class Bitmap
     {
         // How many blocks are given to this data
-        int usedBlock;
-        public int UsedBlock
+        static int usedBlock;
+        public static int UsedBlock
         {
             get { return 1; } 
         }

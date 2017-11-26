@@ -36,6 +36,7 @@ namespace OSWPF1
             iNode.GID = 1;
             iNode.UID = 1;
             iNode.Rights = 198;
+            iNode.Name = tb_filename.Text;
             var handler = new FSHandler("D:\\Test\\test.txt");
             handler.AddFile(iNode);
         }

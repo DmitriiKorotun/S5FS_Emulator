@@ -19,33 +19,10 @@ namespace OSWPF1
         public static short[] GetBlocksArr(Bitmap bitmap, int filesize, int blockSize)
         {
             var blockNum = GetBlocksNum(BlocksForFile(blockSize, filesize), blockSize);
-            //var blockList = new List<short>();
-            //short index = 0;
-
             if (bitmap.BitmapValue.Length * 8 < blockNum)
                 throw new OutOfMemoryException();
 
             return BitWorker.GetFreeBits(bitmap.BitmapValue, blockNum);
-
-            //while (blockList.Count < blockNum && index < bitmap.BitmapValue.Length * 8)
-            //{
-            //    BitWorker.ReadByte
-            //    if (bitmap.BitmapValue[index] == 0)
-            //    {
-            //        blockList.Add((short)(index + 1));
-            //    }
-
-            //    ++index;
-            //}
-
-            //if (index == bitmap.BitmapValue.Length * 8 && blockList.Count < blockNum) //Checks if FS has enough size to write the file
-            //    throw new OutOfMemoryException();
-
-            //short[] blocksArr = new short[blockNum];
-            //for (int i = 0; i < blockNum; ++i)
-            //    blocksArr[i] = blockList[i];
-
-            //return blocksArr;
         }
 
         // Returnes num of blocks needed to write the file
@@ -74,6 +51,53 @@ namespace OSWPF1
                 blocksForAddress = (int)Math.Ceiling((double)blocksNum / (blockSize / 2));
             }
             return blocksForAddress;
+        }
+
+        //Returnes Dictionary with pair: block address - byte arr
+        //I dont use real file data. Instead I just fill the blocks for file data with '1'
+        public static Dictionary<int, byte[]> GetDataArr(short[] freeBlocks, int blockSize)
+        {
+            var dataToWrite = new Dictionary<int, byte[]>();
+
+            const int di_addr_size = 13, startDataBlocks = di_addr_size - 1;
+
+            var addressBlocks = BlocksHandler.BlocksForAddress(freeBlocks.Length, blockSize);
+            int blockIndex = startDataBlocks + addressBlocks;
+
+            for (int i = 0; i < startDataBlocks; ++i)
+                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize]));
+
+            //Writes addresses into the following blocks
+            for (int i = startDataBlocks; i < startDataBlocks + addressBlocks; ++i)
+            {
+                dataToWrite.Add(freeBlocks[i], WriteAddrBlock(new byte[blockSize], freeBlocks, blockIndex));
+                blockIndex += blockSize / 2;
+            }
+
+            //Writes data into the following blocks
+            for (int i = startDataBlocks + addressBlocks; i < freeBlocks.Length; ++i)
+                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize]));
+            return dataToWrite;
+        }
+
+        private static byte[] WriteAddrBlock(byte[] block, short[] freeBlocks, int blockIndex)
+        {
+            //This is an algorithm for 1 level addressation          
+            for (int i = 0; i < block.Length && blockIndex < freeBlocks.Length; i += 2)
+            {
+                var address = BitConverter.GetBytes(freeBlocks[blockIndex]);
+                block[i] = address[0];
+                block[i + 1] = address[1];
+                ++blockIndex;
+            }
+            return block;
+        }
+
+        private static byte[] WriteBlock(byte[] block)
+        {
+            for (int i = 0; i < block.Length; ++i)
+                block[i] = 1;
+            return block;
         }
     }
 }
