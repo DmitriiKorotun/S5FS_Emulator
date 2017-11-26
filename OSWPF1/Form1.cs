@@ -19,11 +19,7 @@ namespace OSWPF1
 
         private void btn_makeFile_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.FileName = "D:\\Test\\test";
-            saveFileDialog1.DefaultExt = ".txt";
-            saveFileDialog1.ShowDialog();
-            var filename = saveFileDialog1.FileName;
-            var lol = new FSHandler(filename);
+            var lol = new FSHandler();
         }
 
         private void button1_Click(object sender, EventArgs e)

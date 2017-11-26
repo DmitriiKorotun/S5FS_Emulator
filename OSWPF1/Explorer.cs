@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace OSWPF1
 {
-    class OSException
+    class Explorer
     {
+        public void GetTree()
+        {
+
+        }
     }
 }

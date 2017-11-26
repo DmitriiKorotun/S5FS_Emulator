@@ -57,11 +57,15 @@
     <Compile Include="ByteConverter.cs" />
     <Compile Include="ByteReader.cs" />
     <Compile Include="DataExtractor.cs" />
+    <Compile Include="DateWorker.cs" />
     <Compile Include="DirHandler.cs" />
+    <Compile Include="DirSeeker.cs" />
+    <Compile Include="Explorer.cs" />
     <Compile Include="File.cs" />
     <Compile Include="FileDataStorage.cs" />
     <Compile Include="FSHandler.cs" />
     <Compile Include="FSPartsWriter.cs" />
+    <Compile Include="GroupPolicy.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="IniHandler.cs" />
     <Compile Include="INode.cs" />
@@ -74,7 +78,7 @@
     <Compile Include="ISystemCalls.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainFile.cs" />
-    <Compile Include="OSException.cs" />
+    <Compile Include="OffsetHandbook.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Superblock.cs" />

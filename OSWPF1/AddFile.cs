@@ -25,9 +25,9 @@ namespace OSWPF1
         private void btn_add_Click(object sender, EventArgs e)
         {
             var iNode = new INode();
-            byte[] ftype = Encoding.ASCII.GetBytes(GetDate(DateTime.Now.Date));
+            byte[] ftype = Encoding.ASCII.GetBytes(DateWorker.GetDate(DateTime.Now.Date));
             iNode.CreationDate = BitConverter.ToInt64(ftype, 0);
-            ftype = Encoding.ASCII.GetBytes(GetDate(DateTime.Now.Date));
+            ftype = Encoding.ASCII.GetBytes(DateWorker.GetDate(DateTime.Now.Date));
             iNode.ChangeDate = BitConverter.ToInt64(ftype, 0);
             iNode.Flag.Hidden = chb_hidden.Checked;
             iNode.Flag.System = chb_system.Checked;
@@ -37,16 +37,11 @@ namespace OSWPF1
             iNode.UID = 1;
             iNode.Rights = 198;
             iNode.Name = tb_filename.Text;
-            var handler = new FSHandler("D:\\Test\\test.txt");
-            handler.AddFile(iNode);
-        }
-
-        private string GetDate(DateTime date)
-        {
-            string dateStr = date.ToString().Substring(0, 10);
-            dateStr = dateStr.Remove(5, 1);
-            dateStr = dateStr.Remove(2, 1);
-            return dateStr;
+            var handler = new FSHandler();
+            if (iNode.Flag.Type == true)
+                DirHandler.WriteDir(iNode, "FS");
+            else
+                handler.AddFile(iNode, "FS", rtb_data.Text);
         }
 
         private bool isAllCompeted()
@@ -55,6 +50,11 @@ namespace OSWPF1
                 return true;
             else
                 return false;
+        }
+
+        private void lbl_progress_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

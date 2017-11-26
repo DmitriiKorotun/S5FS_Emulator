@@ -8,12 +8,17 @@ namespace OSWPF1
 {
     class FSPartsWriter
     {
-        public static long WriteBitmap(System.IO.FileStream fs, Bitmap bitmap)
+        public static long WriteBitmap(System.IO.FileStream fs, Bitmap bitmap, int blockSize)
         {
             long bytesWritten = 0;
             foreach (byte byteElem in bitmap.BitmapValue)
             {
                 fs.WriteByte(byteElem);
+                ++bytesWritten;
+            }
+            while (fs.Position % blockSize != 0)
+            {
+                fs.WriteByte(0);
                 ++bytesWritten;
             }
             return bytesWritten;
@@ -27,6 +32,8 @@ namespace OSWPF1
             fs.Write(BitConverter.GetBytes(superblock.INodeSize), 0, BitConverter.GetBytes(superblock.INodeSize).Length);
             fs.Write(BitConverter.GetBytes(superblock.FreeBlock), 0, BitConverter.GetBytes(superblock.FreeBlock).Length);
             fs.Write(BitConverter.GetBytes(superblock.FreeINode), 0, BitConverter.GetBytes(superblock.FreeINode).Length);
+            while (fs.Position % superblock.ClusterSize != 0)
+                fs.WriteByte(0);
         }
 
         public static long WriteINodes(System.IO.FileStream fs, INode[] iNodes)
@@ -46,7 +53,7 @@ namespace OSWPF1
 
                 for (int j = 0; j < iNodes[i].Di_addr.Length; ++j)
                     fs.Write(BitConverter.GetBytes(iNodes[i].Di_addr[j]), 0, BitConverter.GetBytes(iNodes[i].Di_addr[j]).Length);
-                bytesWritten += 54; //54 is the size of one INode
+                bytesWritten += INode.Offset; //54 is the size of one INode
             }
             return bytesWritten;
         }

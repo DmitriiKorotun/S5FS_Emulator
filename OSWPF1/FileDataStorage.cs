@@ -12,18 +12,21 @@ namespace OSWPF1
         public Superblock Superblock
         {
             get { return superblock; }
+            set { superblock = value; }
         }
 
         Bitmap bitmap;
         public Bitmap Bitmap
         {
             get { return bitmap; }
+            set { bitmap = value; }
         }
 
         Bitmap iNodeMap;
         public Bitmap INodeMap
         {
             get { return iNodeMap; }
+            set { iNodeMap = value; }
         }
 
         public int NodeBlocksOffset

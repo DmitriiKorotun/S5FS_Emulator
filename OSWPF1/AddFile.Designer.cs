@@ -43,6 +43,7 @@
             this.cbox_user = new System.Windows.Forms.ComboBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.lbl_progress = new System.Windows.Forms.Label();
+            this.rtb_data = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.num_size)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,6 +60,7 @@
             // tb_filename
             // 
             this.tb_filename.Location = new System.Drawing.Point(172, 12);
+            this.tb_filename.MaxLength = 16;
             this.tb_filename.Name = "tb_filename";
             this.tb_filename.Size = new System.Drawing.Size(100, 20);
             this.tb_filename.TabIndex = 1;
@@ -196,15 +198,25 @@
             this.lbl_progress.Location = new System.Drawing.Point(12, 185);
             this.lbl_progress.Name = "lbl_progress";
             this.lbl_progress.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.lbl_progress.Size = new System.Drawing.Size(83, 13);
+            this.lbl_progress.Size = new System.Drawing.Size(45, 13);
             this.lbl_progress.TabIndex = 14;
-            this.lbl_progress.Text = "Пользователь:";
+            this.lbl_progress.Text = "Группа:";
+            this.lbl_progress.Click += new System.EventHandler(this.lbl_progress_Click);
+            // 
+            // rtb_data
+            // 
+            this.rtb_data.Location = new System.Drawing.Point(294, 12);
+            this.rtb_data.Name = "rtb_data";
+            this.rtb_data.Size = new System.Drawing.Size(224, 190);
+            this.rtb_data.TabIndex = 15;
+            this.rtb_data.Text = "";
             // 
             // AddFile
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(530, 261);
+            this.Controls.Add(this.rtb_data);
             this.Controls.Add(this.lbl_progress);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.cbox_user);
@@ -245,5 +257,6 @@
         private System.Windows.Forms.ComboBox cbox_user;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label lbl_progress;
+        private System.Windows.Forms.RichTextBox rtb_data;
     }
 }
