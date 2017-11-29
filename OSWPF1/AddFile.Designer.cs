@@ -43,7 +43,10 @@
             this.cbox_user = new System.Windows.Forms.ComboBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.lbl_progress = new System.Windows.Forms.Label();
-            this.rtb_data = new System.Windows.Forms.RichTextBox();
+            this.ofd_addFile = new System.Windows.Forms.OpenFileDialog();
+            this.btn_openFile = new System.Windows.Forms.Button();
+            this.lbl_fullName = new System.Windows.Forms.Label();
+            this.tb_fullName = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.num_size)).BeginInit();
             this.SuspendLayout();
             // 
@@ -109,23 +112,14 @@
             // 
             this.num_size.Location = new System.Drawing.Point(172, 118);
             this.num_size.Maximum = new decimal(new int[] {
-            60000,
-            0,
-            0,
-            0});
-            this.num_size.Minimum = new decimal(new int[] {
-            1,
+            8240,
             0,
             0,
             0});
             this.num_size.Name = "num_size";
+            this.num_size.ReadOnly = true;
             this.num_size.Size = new System.Drawing.Size(84, 20);
             this.num_size.TabIndex = 6;
-            this.num_size.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // lbl_size
             // 
@@ -201,22 +195,47 @@
             this.lbl_progress.Size = new System.Drawing.Size(45, 13);
             this.lbl_progress.TabIndex = 14;
             this.lbl_progress.Text = "Группа:";
-            this.lbl_progress.Click += new System.EventHandler(this.lbl_progress_Click);
             // 
-            // rtb_data
+            // ofd_addFile
             // 
-            this.rtb_data.Location = new System.Drawing.Point(294, 12);
-            this.rtb_data.Name = "rtb_data";
-            this.rtb_data.Size = new System.Drawing.Size(224, 190);
-            this.rtb_data.TabIndex = 15;
-            this.rtb_data.Text = "";
+            this.ofd_addFile.FileName = "file";
+            // 
+            // btn_openFile
+            // 
+            this.btn_openFile.Location = new System.Drawing.Point(309, 12);
+            this.btn_openFile.Name = "btn_openFile";
+            this.btn_openFile.Size = new System.Drawing.Size(89, 23);
+            this.btn_openFile.TabIndex = 15;
+            this.btn_openFile.Text = "Выбрать файл";
+            this.btn_openFile.UseVisualStyleBackColor = true;
+            this.btn_openFile.Click += new System.EventHandler(this.btn_openFile_Click);
+            // 
+            // lbl_fullName
+            // 
+            this.lbl_fullName.AutoSize = true;
+            this.lbl_fullName.Location = new System.Drawing.Point(331, 120);
+            this.lbl_fullName.Name = "lbl_fullName";
+            this.lbl_fullName.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.lbl_fullName.Size = new System.Drawing.Size(71, 13);
+            this.lbl_fullName.TabIndex = 16;
+            this.lbl_fullName.Text = "Полное имя:";
+            // 
+            // tb_fullName
+            // 
+            this.tb_fullName.Location = new System.Drawing.Point(421, 117);
+            this.tb_fullName.MaxLength = 16;
+            this.tb_fullName.Name = "tb_fullName";
+            this.tb_fullName.Size = new System.Drawing.Size(100, 20);
+            this.tb_fullName.TabIndex = 17;
             // 
             // AddFile
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(530, 261);
-            this.Controls.Add(this.rtb_data);
+            this.ClientSize = new System.Drawing.Size(586, 261);
+            this.Controls.Add(this.tb_fullName);
+            this.Controls.Add(this.lbl_fullName);
+            this.Controls.Add(this.btn_openFile);
             this.Controls.Add(this.lbl_progress);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.cbox_user);
@@ -257,6 +276,9 @@
         private System.Windows.Forms.ComboBox cbox_user;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label lbl_progress;
-        private System.Windows.Forms.RichTextBox rtb_data;
+        private System.Windows.Forms.OpenFileDialog ofd_addFile;
+        private System.Windows.Forms.Button btn_openFile;
+        private System.Windows.Forms.Label lbl_fullName;
+        private System.Windows.Forms.TextBox tb_fullName;
     }
 }

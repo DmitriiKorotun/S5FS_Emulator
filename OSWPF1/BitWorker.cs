@@ -47,6 +47,21 @@ namespace OSWPF1
             return bitIndex;
         }
 
+        public static int GetFirstFree(byte[] byteArr)
+        {
+            int blockNum = -1;
+            for (int i = 0; i < byteArr.Length; ++i)
+            {
+                if (byteArr[i] == 255)
+                    continue;
+                else
+                {
+                    blockNum = ReadByte(byteArr[i]);
+                }
+            }
+            return blockNum;
+        }
+
         public static short[] GetFreeBits(byte[] byteArr, int bitsToFind)
         {
             List<short> addr_list = new List<short>();
@@ -105,19 +120,6 @@ namespace OSWPF1
             return addresses;
         }
 
-        public static int GetFirstFree(byte[] byteArr)
-        {
-            int blockNum = -1;
-            for (int i = 0; i < byteArr.Length; ++i)
-            {
-                if (byteArr[i] == 255)
-                    continue;
-                else
-                {
-                    blockNum = ReadByte(byteArr[i]);
-                }
-            }
-            return blockNum;
-        }
+
     }
 }

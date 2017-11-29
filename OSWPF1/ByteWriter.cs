@@ -8,6 +8,11 @@ namespace OSWPF1
 {
     class ByteWriter
     {
+        public static void WriteJunk(byte[] block)
+        {
+
+        }
+
         //Fills the file with fixed num of junk('0') starting from the current position
         public static void WriteJunk(System.IO.FileStream fs, long numOfJunk) //Should return num of bytes that have been written
         {

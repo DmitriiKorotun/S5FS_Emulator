@@ -37,5 +37,20 @@ namespace OSWPF1
         {
 
         }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            Update(tv_dirView);
+        }
+
+        private void Update(TreeView view)
+        {
+            view.Nodes.Add(DirSeeker.GetFileList(1, 4096, "\\"));
+        }
+
+        private void btn_delFile_Click(object sender, EventArgs e)
+        {
+            var kek = tv_dirView.SelectedNode;
+        }
     }
 }

@@ -24,6 +24,18 @@ namespace OSWPF1
 
         private void btn_add_Click(object sender, EventArgs e)
         {
+            TryToWrite(tb_fullName.Text);
+        }
+
+        private void btn_openFile_Click(object sender, EventArgs e)
+        {
+            ChoseFile();
+        }
+
+        private void TryToWrite(string fullName)
+        {
+            if (fullName == "")
+                throw new Exception("Файл не выбран");
             var iNode = new INode();
             byte[] ftype = Encoding.ASCII.GetBytes(DateWorker.GetDate(DateTime.Now.Date));
             iNode.CreationDate = BitConverter.ToInt64(ftype, 0);
@@ -41,7 +53,26 @@ namespace OSWPF1
             if (iNode.Flag.Type == true)
                 DirHandler.WriteDir(iNode, "FS");
             else
-                handler.AddFile(iNode, "FS", rtb_data.Text);
+            {
+                handler.AddFile(iNode, "FS", System.IO.File.ReadAllBytes(fullName), 1);
+            }
+        }
+
+        private void ChoseFile()
+        {
+            if (ofd_addFile.ShowDialog() == DialogResult.OK && System.IO.File.Exists(ofd_addFile.FileName))
+            {
+                var fileInfo = new System.IO.FileInfo(ofd_addFile.FileName);
+
+                if (fileInfo.Length / 1024 > num_size.Maximum)
+                    MessageBox.Show("Размер файла слишком большой", "Ошибка");
+                else
+                {
+                    SetValue(tb_filename, fileInfo.Name);
+                    SetValue(num_size, fileInfo.Length / 1024);
+                    SetValue(tb_fullName, fileInfo.FullName);
+                }
+            }
         }
 
         private bool isAllCompeted()
@@ -52,9 +83,14 @@ namespace OSWPF1
                 return false;
         }
 
-        private void lbl_progress_Click(object sender, EventArgs e)
+        private void SetValue<T>(T control, string value) where T: Control
         {
+            control.Text = value;
+        }
 
+        private void SetValue(NumericUpDown numeric, long value)
+        {
+            numeric.Value = value;
         }
     }
 }

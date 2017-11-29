@@ -16,6 +16,14 @@ namespace OSWPF1
             return BitConverter.ToInt16(byteArr, 0);
         }
 
+        public static short ShortFromBytes(byte[] data, int startIndex)
+        {
+            byte[] byteArr = new byte[2];
+            for (int i = 0; i < byteArr.Length; ++i)
+                byteArr[i] = data[startIndex + i];
+            return BitConverter.ToInt16(byteArr, 0);
+        }
+
         public static int IntFromBytes(System.IO.FileStream fs)
         {
             byte[] byteArr = new byte[4];

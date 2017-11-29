@@ -61,7 +61,7 @@
     <Compile Include="DirHandler.cs" />
     <Compile Include="DirSeeker.cs" />
     <Compile Include="Explorer.cs" />
-    <Compile Include="File.cs" />
+    <Compile Include="FileCleaner.cs" />
     <Compile Include="FileDataStorage.cs" />
     <Compile Include="FSHandler.cs" />
     <Compile Include="FSPartsWriter.cs" />

@@ -26,7 +26,7 @@ namespace OSWPF1
             return bitmap;
         }
 
-        internal static int GetFreeBlock(Bitmap blockMap)
+        internal static int GetFreeBlockNum(Bitmap blockMap)
         {
             int i = 0, blockNum = -1;
             bool isFound = false;
@@ -69,7 +69,8 @@ namespace OSWPF1
         public static INode GetINode(System.IO.FileStream fs, int nodeNum)
         {
             var node = new INode();
-            fs.Position = OffsetHandbook.GetNodesStart() + INode.Offset * (nodeNum - 1);
+            fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.INODES) +
+                OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.INODE) * (nodeNum - 1);
             var nodeInBytes = new byte[INode.Offset];
             for (int i = 0; i < nodeInBytes.Length; ++i)
                 nodeInBytes[i] = (byte)fs.ReadByte();

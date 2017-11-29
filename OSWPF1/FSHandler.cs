@@ -8,15 +8,15 @@ namespace OSWPF1
 {
     class FSHandler
     {
+        public FSHandler()
+        {
+            CheckForFile();
+        }
+
         void CheckForFile()
         {
             if (!System.IO.File.Exists("FS"))
                 CreateMainFile("FS");       
-        }
-
-        public FSHandler()
-        {
-            CheckForFile();
         }
 
         //It creates the FS file and wrytes the superblock info to this file
@@ -39,56 +39,91 @@ namespace OSWPF1
             DirHandler.WriteDir(new INode(), "FS");
         }
 
+        public void AddFile(INode iNode, string path, byte[] data, short dirNode)
+        {
+            var storage = DataExtractor.GetData(path);
+            DirHandler.AddFileToDir(iNode.Name, storage.Superblock.ClusterSize, dirNode,
+                CommitFile(storage, iNode, path, data), iNode.Flag.Type);
+        }
+
+        public short CommitFile(FileDataStorage storage, INode iNode, string path, byte[] data)
+        {
+            var blocks = BlocksHandler.GetBlocksArr(storage.Bitmap, iNode.Size, storage.Superblock.ClusterSize);
+            var nodeNum = CompleteFileInfo(ref storage, ref iNode, data, blocks);
+            WriteFileInfo(storage, iNode, path, nodeNum);
+            WriteFileBlocks(storage, GetDataDict(blocks, data, storage.Superblock.ClusterSize), path);
+            return nodeNum;
+        }
+
+        private short CompleteFileInfo(ref FileDataStorage storage, ref INode iNode, byte[] data, short[] blocks)
+        {
+            if (iNode.Size / 1024 > 8240)
+                throw new Exception("File size is too big");
+            //Add exception for file is corrupted by checking size
+
+            int nodeNum = DataExtractor.GetINodeNum(storage.INodeMap);
+            for (int i = 0; i < blocks.Length; ++i)
+            {
+                storage.Bitmap.BitmapValue = BitWorker.TurnBitOn(storage.Bitmap.BitmapValue, blocks[i]);
+            }
+            storage.INodeMap.BitmapValue = BitWorker.TurnBitOn(storage.INodeMap.BitmapValue, nodeNum);
+            iNode = FillDAddr(iNode, GetDataDict(blocks, data, storage.Superblock.ClusterSize));
+
+            return (short)nodeNum;
+        }
+
+        private INode FillDAddr(INode node, Dictionary<int, byte[]> data)
+        {
+            var dataKeys = GetDataKeys(data);
+            for (int index = 0; index < node.Di_addr.Length && index < data.Count; ++index)
+            {
+                node.Di_addr[index] = (short)dataKeys[index]; //To change short for int cause data can be lost
+            }
+            return node;
+        }
+
+        private void WriteFileInfo(FileDataStorage storage, INode iNode, string path, short nodeNum)
+        {
+            using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
+            {
+                fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.BITMAP);
+                FSPartsWriter.WriteBitmap(fs, storage.Bitmap, storage.Superblock.ClusterSize);
+                FSPartsWriter.WriteBitmap(fs, storage.INodeMap, storage.Superblock.ClusterSize);
+                fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.INODES) +
+                    OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.INODE) * (nodeNum - 1);
+                FSPartsWriter.WriteINode(fs, iNode);
+
+            }
+        }
+
+        private void WriteFileBlocks(FileDataStorage storage, Dictionary<int, byte[]> data, string path)
+        {
+            var dataKeys = GetDataKeys(data);
+            using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
+            {
+                fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR);
+                for (int i = 0; i < storage.Bitmap.BitmapValue.Length * 8; ++i)
+                {
+                    if (dataKeys.Contains(i))
+                        ByteWriter.WriteBlock(fs, storage.Superblock.ClusterSize, data[i]);
+                }
+            }
+        }
+
         public static long GetBlockEnd(int blockSize, long position)
         {
             long blockEndAddr = position, remDiv = blockEndAddr % blockSize, diff = blockSize - remDiv;
             return blockEndAddr + diff;
         }
 
-        private bool WriteFile(FileDataStorage storage, INode iNode, string data, string path)
+        private List<int> GetDataKeys(Dictionary<int, byte[]> data)
         {
-            using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
-            {
-                if (iNode.Size / 1024 > 8240)
-                    throw new Exception("File size is too big");
-                //Add exception for file is corrupted by checking size
-
-                int nodeNum = DataExtractor.GetINodeNum(storage.INodeMap);
-                fs.Position = GetBlockEnd(OffsetHandbook.GetSuperblockStart(), fs.Position);
-                var blocks = BlocksHandler.GetBlocksArr(storage.Bitmap, iNode.Size, storage.Superblock.ClusterSize);
-
-                for (int i = 0; i < blocks.Length; ++i)
-                {
-                    storage.Bitmap.BitmapValue = BitWorker.TurnBitOn(storage.Bitmap.BitmapValue, blocks[i]);
-                }
-                FSPartsWriter.WriteBitmap(fs, storage.Bitmap, storage.Superblock.ClusterSize);
-                storage.INodeMap.BitmapValue = BitWorker.TurnBitOn(storage.INodeMap.BitmapValue, nodeNum);
-                FSPartsWriter.WriteBitmap(fs, storage.INodeMap, storage.Superblock.ClusterSize);
-                
-                var dataDict = BlocksHandler.GetDataArr(blocks, storage.Superblock.ClusterSize);
-                List<int> dataKeys = new List<int>(dataDict.Keys);
-                for (int index = 0; index < iNode.Di_addr.Length && index < dataDict.Count; ++index)
-                {
-                    iNode.Di_addr[index] = (short)dataKeys[index]; //To change short for int cause data can be lost
-                }
-
-                fs.Position = GetBlockEnd(OffsetHandbook.GetIMapStart(), fs.Position) + INode.Offset * (nodeNum - 1);
-                FSPartsWriter.WriteINode(fs, iNode);
-                fs.Position = GetBlockEnd(OffsetHandbook.GetMainDirStart(), fs.Position);
-                for (int i = 0; i < storage.Bitmap.BitmapValue.Length * 8; ++i)
-                {
-                    if (dataKeys.Contains(i))
-                        ByteWriter.WriteBlock(fs, storage.Superblock.ClusterSize, dataDict[i]);
-                }
-                return true;
-            }
+            return new List<int>(data.Keys);
         }
 
-        public void AddFile(INode iNode, string path, string data)
+        private Dictionary<int, byte[]> GetDataDict(short[] blocks, byte[] data, int clusterSize)
         {
-            WriteFile(DataExtractor.GetData(path), iNode, data, path);
+            return BlocksHandler.GetDataArr(blocks, data, clusterSize);
         }
-
-
     }
 }

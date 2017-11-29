@@ -8,7 +8,7 @@ namespace OSWPF1 //To change it completely
 {
     class OffsetHandbook
     {
-        public enum offsetGuide : long
+        public enum posGuide : long
         {
             SUPERBLOCK = 0,
             BITMAP = 4096,
@@ -17,29 +17,21 @@ namespace OSWPF1 //To change it completely
             MAINDIR = 841728,
         }
 
-        public static int GetSuperblockStart()
+        public enum sizeGuide : int
         {
-            return 0;
+            FILEINDIR = 20,
+            INODE = 54,
+
         }
 
-        public static int GetBitmapStart()
+        public static long GetPos(posGuide pos)
         {
-            return 4096;
+            return (long)pos;
         }
 
-        public static int GetIMapStart()
+        public static int GetOffs(sizeGuide offs)
         {
-            return 8192;
-        }
-
-        public static int GetNodesStart()
-        {
-            return 12288;
-        }
-
-        public static int GetMainDirStart()
-        {
-            return 841728;
+            return (int)offs;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace OSWPF1
 
         //Returnes Dictionary with pair: block address - byte arr
         //I dont use real file data. Instead I just fill the blocks for file data with '1'
-        public static Dictionary<int, byte[]> GetDataArr(short[] freeBlocks, int blockSize)
+        public static Dictionary<int, byte[]> GetDataArr(short[] freeBlocks, byte[] data, int blockSize)
         {
             var dataToWrite = new Dictionary<int, byte[]>();
 
@@ -64,8 +64,8 @@ namespace OSWPF1
             var addressBlocks = BlocksHandler.BlocksForAddress(freeBlocks.Length, blockSize);
             int blockIndex = startDataBlocks + addressBlocks;
 
-            for (int i = 0; i < startDataBlocks; ++i)
-                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize]));
+            for (int i = 0; i < startDataBlocks && i < freeBlocks.Length; ++i)
+                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize], data, i * blockSize));
 
             //Writes addresses into the following blocks
             for (int i = startDataBlocks; i < startDataBlocks + addressBlocks; ++i)
@@ -76,7 +76,9 @@ namespace OSWPF1
 
             //Writes data into the following blocks
             for (int i = startDataBlocks + addressBlocks; i < freeBlocks.Length; ++i)
-                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize]));
+            {
+                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize], data, i * blockSize));
+            }
             return dataToWrite;
         }
 
@@ -93,11 +95,25 @@ namespace OSWPF1
             return block;
         }
 
-        private static byte[] WriteBlock(byte[] block)
+        private static byte[] WriteBlock(byte[] block, byte[] data, int startIndex)
         {
-            for (int i = 0; i < block.Length; ++i)
-                block[i] = 1;
+            for (int i = 0; i < block.Length && startIndex + i < data.Length; ++i)
+                block[i] = data[startIndex + i];
             return block;
+        }
+
+        public static byte[] GetBlock(System.IO.FileStream fs, int blockSize, short blockNum)
+        {
+            var block = new byte[blockSize];
+            fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR) + (blockNum - 1) * blockSize;
+            fs.Read(block, 0, block.Length);
+            return block;
+        }
+
+        public static bool IsBlocksMany(int size, int blockSize)
+        {
+            var isBlocksMany = size / blockSize > 13 ? true : false;
+            return isBlocksMany;
         }
     }
 }

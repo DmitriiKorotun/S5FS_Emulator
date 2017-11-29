@@ -11,18 +11,30 @@ namespace OSWPF1
         public INode()
         {
             flag = new Flags();
-            byte[] ftype = Encoding.ASCII.GetBytes(DateWorker.GetDate(DateTime.Now.Date));
-            CreationDate = BitConverter.ToInt64(ftype, 0);
-            ftype = Encoding.ASCII.GetBytes(DateWorker.GetDate(DateTime.Now.Date));
-            ChangeDate = BitConverter.ToInt64(ftype, 0);
+            CreationDate = DateTime.Now.ToBinary();
+            ChangeDate = DateTime.Now.ToBinary();
             Flag.Hidden = false;
-            Flag.System = true;
-            Flag.Type = true;
+            Flag.System = false;
+            Flag.Type = false;
             Size = 0;
             GID = 1;
             UID = 1;
             Rights = 198;
             Name = "\\";
+        }
+
+        public INode(Flags flags, long crDate, long chDate, int size, short gid, short uid, short rights, string name)
+        {
+            Flag.Hidden = flags.Hidden;
+            Flag.System = flags.System;
+            Flag.Type = flags.Type;
+            CreationDate = crDate;
+            ChangeDate = chDate;
+            Size = size;
+            GID = gid;
+            UID = uid;
+            Rights = rights;
+            Name = name;
         }
 
         long changeDate;

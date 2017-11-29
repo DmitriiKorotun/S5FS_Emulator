@@ -37,6 +37,8 @@
             this.btn_addGroup = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.tv_dirView = new System.Windows.Forms.TreeView();
+            this.btn_update = new System.Windows.Forms.Button();
+            this.btn_delFile = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBox1
@@ -114,11 +116,33 @@
             this.tv_dirView.Size = new System.Drawing.Size(195, 237);
             this.tv_dirView.TabIndex = 7;
             // 
+            // btn_update
+            // 
+            this.btn_update.Location = new System.Drawing.Point(12, 89);
+            this.btn_update.Name = "btn_update";
+            this.btn_update.Size = new System.Drawing.Size(75, 23);
+            this.btn_update.TabIndex = 8;
+            this.btn_update.Text = "Обновить";
+            this.btn_update.UseVisualStyleBackColor = true;
+            this.btn_update.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // btn_delFile
+            // 
+            this.btn_delFile.Location = new System.Drawing.Point(172, 89);
+            this.btn_delFile.Name = "btn_delFile";
+            this.btn_delFile.Size = new System.Drawing.Size(100, 23);
+            this.btn_delFile.TabIndex = 9;
+            this.btn_delFile.Text = "Удалить файл";
+            this.btn_delFile.UseVisualStyleBackColor = true;
+            this.btn_delFile.Click += new System.EventHandler(this.btn_delFile_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(485, 261);
+            this.Controls.Add(this.btn_delFile);
+            this.Controls.Add(this.btn_update);
             this.Controls.Add(this.tv_dirView);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.btn_addGroup);
@@ -145,6 +169,8 @@
         private System.Windows.Forms.Button btn_addGroup;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.TreeView tv_dirView;
+        private System.Windows.Forms.Button btn_update;
+        private System.Windows.Forms.Button btn_delFile;
     }
 }
 
