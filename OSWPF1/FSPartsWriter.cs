@@ -24,6 +24,22 @@ namespace OSWPF1
             return bytesWritten;
         }
 
+        public static long WriteBitmap(System.IO.FileStream fs, byte[] bitmap, int blockSize)
+        {
+            long bytesWritten = 0;
+            foreach (byte byteElem in bitmap)
+            {
+                fs.WriteByte(byteElem);
+                ++bytesWritten;
+            }
+            while (fs.Position % blockSize != 0)
+            {
+                fs.WriteByte(0);
+                ++bytesWritten;
+            }
+            return bytesWritten;
+        }
+
         public static void WriteSuperblock(System.IO.FileStream fs, Superblock superblock)
         {
             fs.Write(BitConverter.GetBytes(superblock.ClusterSize), 0, BitConverter.GetBytes(superblock.ClusterSize).Length);

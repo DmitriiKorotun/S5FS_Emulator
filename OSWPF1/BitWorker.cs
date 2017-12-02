@@ -10,7 +10,7 @@ namespace OSWPF1
     {
         public static byte[] TurnBitOn(byte[] arr, int blockNum)
         {
-            int byteIndex = blockNum / 8;
+            int byteIndex = (blockNum - 1) / 8;
             int bitIndex = blockNum % 8;
             if (blockNum % 8 == 0) //Need to remove it after refacktoring blocks structure. Start index should be 0 not 1
                 bitIndex = 8;
@@ -21,7 +21,7 @@ namespace OSWPF1
 
         public static byte[] TurnBitOff(byte[] arr, int blockNum)
         {
-            int byteIndex = blockNum / 8;
+            int byteIndex = (blockNum - 1) / 8;
             int bitIndex = blockNum % 8;
             if (blockNum % 8 == 0) //Need to remove it after refacktoring blocks structure. Start index should be 0 not 1
                 bitIndex = 8;
@@ -56,7 +56,8 @@ namespace OSWPF1
                     continue;
                 else
                 {
-                    blockNum = ReadByte(byteArr[i]);
+                    blockNum = ReadByte(byteArr[i]) + 8 * i ;
+                    break;
                 }
             }
             return blockNum;

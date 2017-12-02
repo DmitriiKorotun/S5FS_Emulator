@@ -26,6 +26,15 @@ namespace OSWPF1
             return bitmap;
         }
 
+        public static byte[] GetBitmap(System.IO.FileStream fs, int bmLength)
+        {
+            var bm = new byte[bmLength];
+            fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.BITMAP);
+            for (int i = 0; i < bm.Length; ++i)
+                bm[i] = (byte)fs.ReadByte();
+            return bm;
+        }
+
         internal static int GetFreeBlockNum(Bitmap blockMap)
         {
             int i = 0, blockNum = -1;

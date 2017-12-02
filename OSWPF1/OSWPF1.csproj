@@ -60,6 +60,7 @@
     <Compile Include="DateWorker.cs" />
     <Compile Include="DirHandler.cs" />
     <Compile Include="DirSeeker.cs" />
+    <Compile Include="OSException.cs" />
     <Compile Include="Explorer.cs" />
     <Compile Include="FileCleaner.cs" />
     <Compile Include="FileDataStorage.cs" />
