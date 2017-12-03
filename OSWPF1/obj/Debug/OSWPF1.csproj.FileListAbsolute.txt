@@ -1,7 +1,6 @@
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\bin\Debug\OSWPF1.exe.config
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\bin\Debug\OSWPF1.exe
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\bin\Debug\OSWPF1.pdb
-C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.csprojResolveAssemblyReference.cache
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.Form1.resources
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.Properties.Resources.resources
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.csproj.GenerateResource.Cache
@@ -19,3 +18,4 @@ C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWP
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.csproj.GenerateResource.Cache
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\bin\Debug\OSWPF1.exe
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\bin\Debug\OSWPF1.pdb
+C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.csprojResolveAssemblyReference.cache

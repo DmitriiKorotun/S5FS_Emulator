@@ -139,7 +139,7 @@ namespace OSWPF1
             set
             {
                 if (value.Length > 16)
-                    throw new Exception("String is too big");
+                    throw new ArgumentOutOfRangeException("String is too big");
                 name = value;
             }
         }

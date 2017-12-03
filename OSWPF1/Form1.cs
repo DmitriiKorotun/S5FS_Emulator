@@ -17,9 +17,9 @@ namespace OSWPF1
             InitializeComponent();
         }
 
-        private void btn_makeFile_Click(object sender, EventArgs e)
+        public TreeView TV_FilesView
         {
-            var lol = new FSHandler();
+            get { Update(tv_dirView); return tv_dirView; }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -33,11 +33,6 @@ namespace OSWPF1
             Close();
         }
 
-        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-
-        }
-
         private void button1_Click_1(object sender, EventArgs e)
         {
             Update(tv_dirView);
@@ -45,12 +40,21 @@ namespace OSWPF1
 
         private void Update(TreeView view)
         {
+            var selectedText = view.SelectedNode == null ? "" : view.SelectedNode.Text;
+            view.Nodes.Clear();
             view.Nodes.Add(DirSeeker.GetFileList(1, 4096, "\\"));
+            view.SelectedNode = view.Nodes.Cast<TreeNode>().SingleOrDefault(n => n.Text == selectedText);
         }
 
-        private void btn_delFile_Click(object sender, EventArgs e)
+        private void addFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var kek = tv_dirView.SelectedNode;
+            var addFileForm = new AddFile();
+            addFileForm.ShowDialog(this);
+        }
+
+        private void createFSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var fsHandler = new FSHandler();
         }
     }
 }

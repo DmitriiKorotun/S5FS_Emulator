@@ -24,7 +24,16 @@ namespace OSWPF1
 
         private void btn_add_Click(object sender, EventArgs e)
         {
-            TryToWrite(tb_fullName.Text);
+            try
+            {
+                var tv_dirView = ((Form1)this.Owner).TV_FilesView;
+                TryToWrite(tb_fullName.Text, tv_dirView.SelectedNode);
+            }
+            catch (ArgumentOutOfRangeException exception)
+            {
+                MessageBox.Show(exception.Message, "Значение слишком большое");
+            }
+
         }
 
         private void btn_openFile_Click(object sender, EventArgs e)
@@ -32,7 +41,7 @@ namespace OSWPF1
             ChoseFile();
         }
 
-        private void TryToWrite(string fullName)
+        private void TryToWrite(string fullName, TreeNode tree)
         {
             if (fullName == "")
                 throw new Exception("Файл не выбран");
@@ -51,7 +60,7 @@ namespace OSWPF1
             iNode.Name = tb_filename.Text;
             var handler = new FSHandler();
             if (iNode.Flag.Type == true)
-                DirHandler.WriteDir(iNode, "FS");
+                DirHandler.WriteDir(iNode, "FS", DirSeeker.GetNeededFileNode(tree, 4096)); //Make 4096 dynamic
             else
             {
                 handler.AddFile(iNode, "FS", System.IO.File.ReadAllBytes(fullName), 1);

@@ -85,6 +85,7 @@
     <Compile Include="Superblock.cs" />
     <Compile Include="ByteWriter.cs" />
     <Compile Include="SystemCalls.cs" />
+    <Compile Include="SystemSigns.cs" />
     <Compile Include="UserGroupData.cs" />
     <EmbeddedResource Include="AddFile.resx">
       <DependentUpon>AddFile.cs</DependentUpon>

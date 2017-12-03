@@ -28,49 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.btn_makeFile = new System.Windows.Forms.Button();
-            this.btn_addFile = new System.Windows.Forms.Button();
             this.btn_exit = new System.Windows.Forms.Button();
             this.btn_addUser = new System.Windows.Forms.Button();
             this.btn_addGroup = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
             this.tv_dirView = new System.Windows.Forms.TreeView();
             this.btn_update = new System.Windows.Forms.Button();
-            this.btn_delFile = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.фСToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createFSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.delFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.пользователиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(172, 181);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 20);
-            this.textBox1.TabIndex = 0;
-            // 
-            // saveFileDialog1
-            // 
-            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
-            // 
-            // btn_makeFile
-            // 
-            this.btn_makeFile.Location = new System.Drawing.Point(12, 12);
-            this.btn_makeFile.Name = "btn_makeFile";
-            this.btn_makeFile.Size = new System.Drawing.Size(100, 23);
-            this.btn_makeFile.TabIndex = 1;
-            this.btn_makeFile.Text = "Создать ФС";
-            this.btn_makeFile.UseVisualStyleBackColor = true;
-            this.btn_makeFile.Click += new System.EventHandler(this.btn_makeFile_Click);
-            // 
-            // btn_addFile
-            // 
-            this.btn_addFile.Location = new System.Drawing.Point(172, 12);
-            this.btn_addFile.Name = "btn_addFile";
-            this.btn_addFile.Size = new System.Drawing.Size(100, 23);
-            this.btn_addFile.TabIndex = 2;
-            this.btn_addFile.Text = "Добавить файл";
-            this.btn_addFile.UseVisualStyleBackColor = true;
-            this.btn_addFile.Click += new System.EventHandler(this.button1_Click);
             // 
             // btn_exit
             // 
@@ -100,17 +72,9 @@
             this.btn_addGroup.Text = "Добавить группу";
             this.btn_addGroup.UseVisualStyleBackColor = true;
             // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(172, 207);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(100, 23);
-            this.button3.TabIndex = 6;
-            this.button3.Text = "Удалить файл";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
             // tv_dirView
             // 
+            this.tv_dirView.HideSelection = false;
             this.tv_dirView.Location = new System.Drawing.Point(278, 12);
             this.tv_dirView.Name = "tv_dirView";
             this.tv_dirView.Size = new System.Drawing.Size(195, 237);
@@ -126,51 +90,96 @@
             this.btn_update.UseVisualStyleBackColor = true;
             this.btn_update.Click += new System.EventHandler(this.button1_Click_1);
             // 
-            // btn_delFile
+            // menuStrip1
             // 
-            this.btn_delFile.Location = new System.Drawing.Point(172, 89);
-            this.btn_delFile.Name = "btn_delFile";
-            this.btn_delFile.Size = new System.Drawing.Size(100, 23);
-            this.btn_delFile.TabIndex = 9;
-            this.btn_delFile.Text = "Удалить файл";
-            this.btn_delFile.UseVisualStyleBackColor = true;
-            this.btn_delFile.Click += new System.EventHandler(this.btn_delFile_Click);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.фСToolStripMenuItem,
+            this.fileToolStripMenuItem,
+            this.пользователиToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(485, 24);
+            this.menuStrip1.TabIndex = 10;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // фСToolStripMenuItem
+            // 
+            this.фСToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.createFSToolStripMenuItem});
+            this.фСToolStripMenuItem.Name = "фСToolStripMenuItem";
+            this.фСToolStripMenuItem.Size = new System.Drawing.Size(36, 20);
+            this.фСToolStripMenuItem.Text = "ФС";
+            // 
+            // createFSToolStripMenuItem
+            // 
+            this.createFSToolStripMenuItem.Name = "createFSToolStripMenuItem";
+            this.createFSToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.createFSToolStripMenuItem.Text = "Создать ФС";
+            this.createFSToolStripMenuItem.Click += new System.EventHandler(this.createFSToolStripMenuItem_Click);
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addFileToolStripMenuItem,
+            this.delFileToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.fileToolStripMenuItem.Text = "Файл";
+            // 
+            // addFileToolStripMenuItem
+            // 
+            this.addFileToolStripMenuItem.Name = "addFileToolStripMenuItem";
+            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.addFileToolStripMenuItem.Text = "Добавить файл";
+            this.addFileToolStripMenuItem.Click += new System.EventHandler(this.addFileToolStripMenuItem_Click);
+            // 
+            // delFileToolStripMenuItem
+            // 
+            this.delFileToolStripMenuItem.Name = "delFileToolStripMenuItem";
+            this.delFileToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.delFileToolStripMenuItem.Text = "Удалить файл";
+            // 
+            // пользователиToolStripMenuItem
+            // 
+            this.пользователиToolStripMenuItem.Name = "пользователиToolStripMenuItem";
+            this.пользователиToolStripMenuItem.Size = new System.Drawing.Size(97, 20);
+            this.пользователиToolStripMenuItem.Text = "Пользователи";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(485, 261);
-            this.Controls.Add(this.btn_delFile);
             this.Controls.Add(this.btn_update);
             this.Controls.Add(this.tv_dirView);
-            this.Controls.Add(this.button3);
             this.Controls.Add(this.btn_addGroup);
             this.Controls.Add(this.btn_addUser);
             this.Controls.Add(this.btn_exit);
-            this.Controls.Add(this.btn_addFile);
-            this.Controls.Add(this.btn_makeFile);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
-        private System.Windows.Forms.Button btn_makeFile;
-        private System.Windows.Forms.Button btn_addFile;
         private System.Windows.Forms.Button btn_exit;
         private System.Windows.Forms.Button btn_addUser;
         private System.Windows.Forms.Button btn_addGroup;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.TreeView tv_dirView;
         private System.Windows.Forms.Button btn_update;
-        private System.Windows.Forms.Button btn_delFile;
+        private System.Windows.Forms.TreeView tv_dirView;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem delFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem пользователиToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem фСToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createFSToolStripMenuItem;
     }
 }
 

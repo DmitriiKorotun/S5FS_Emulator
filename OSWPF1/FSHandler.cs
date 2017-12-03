@@ -36,7 +36,7 @@ namespace OSWPF1
                     throw e;
                 }
             }
-            DirHandler.WriteDir(new INode(), "FS");
+            DirHandler.WriteDir(new INode(), "FS", 0); //Change 0 to INITDIR enum
         }
 
         public void AddFile(INode iNode, string path, byte[] data, short dirNode)

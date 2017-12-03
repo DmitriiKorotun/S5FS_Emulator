@@ -8,12 +8,17 @@ namespace OSWPF1
 {
     class DirHandler
     {
-        public static void WriteDir(INode iNode, string path)
+        public static void WriteDir(INode iNode, string path, short dirNode)
         {
-            PrepDirData(iNode, DataExtractor.GetData(path), path);
+            var storage = DataExtractor.GetData(path);
+            var nodeNum = PrepDirData(ref iNode, ref storage, path);
+            WriteDir(System.IO.File.OpenWrite(path), iNode, storage, nodeNum);
+            if (dirNode != (short)SystemSigns.Signs.CREATEMAINDIR)
+                DirHandler.AddFileToDir(iNode.Name, storage.Superblock.ClusterSize, dirNode,
+                nodeNum, iNode.Flag.Type);
         }
 
-        private static void PrepDirData(INode iNode, FileDataStorage storage, string path)
+        private static short PrepDirData(ref INode iNode, ref FileDataStorage storage, string path)
         {
             int nodeNum = DataExtractor.GetINodeNum(storage.INodeMap);
             var blocks = BlocksHandler.GetBlocksArr(storage.Bitmap, iNode.Size, storage.Superblock.ClusterSize);
@@ -30,7 +35,7 @@ namespace OSWPF1
                 iNode.Di_addr[index] = (short)dataKeys[index]; //To change short for int cause data can be lost
             }
 
-            WriteDir(System.IO.File.OpenWrite(path), iNode, storage, nodeNum);
+            return (short)nodeNum;
         }
 
 
@@ -68,12 +73,10 @@ namespace OSWPF1
                 {
                     try
                     {
-                        var blockNum = AppendBlockToDir(ref node, DataExtractor.GetBitmap(fs, 1920));
+                        var blockNum = SetNewDirBlock(fs, ref node, blockSize, dirNode);
                         var prepInfo = GetFileInfo(fs, ComposeInfo(name, fileNode, type), blockSize, dirNode);
                         if (!WriteBlock(fs, prepInfo, blockSize, blockNum))
                             throw new System.IO.IOException("File dir data hasn't been written in the file");
-                        if (!WriteBitmap(fs, blockNum, blockSize))
-                            throw new System.IO.IOException("Bitmap hasn't been written in the file");
                     }
                     catch (Exception e)
                     {
@@ -118,8 +121,7 @@ namespace OSWPF1
         private static int GetOffset(byte[] block)
         {
             var offset = -1;
-            for (int i = 0; i < block.Length / OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR);
-                i += OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR))
+            for (int i = 0; i < block.Length / OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR); ++i)
             {
                 bool isFree = true;
                 for (int j = 0; j < OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR); ++j)
@@ -132,7 +134,7 @@ namespace OSWPF1
                 }
                 if (isFree)
                 {
-                    offset = i;
+                    offset = i * OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR);
                     break;
                 }
             }
@@ -177,6 +179,14 @@ namespace OSWPF1
             return true;
         }
 
+        public static short SetNewDirBlock(System.IO.FileStream fs, ref INode node, int blockSize, short nodeNum)
+        {
+            var blockNum = AppendBlockToDir(ref node, DataExtractor.GetBitmap(fs, 1920));
+            if(!WriteBlockToDir(fs, blockNum, blockSize) || !WriteNodeToFile(fs, node, nodeNum))
+                throw new Exception();
+            return blockNum;
+        }
+
         public static short AppendBlockToDir(ref INode dirNode, byte[] bitmap)
         {
             short blockNum = -1;
@@ -186,12 +196,27 @@ namespace OSWPF1
                     continue;
                 dirNode.Di_addr[i] = (short)BitWorker.GetFirstFree(bitmap);
                 blockNum = dirNode.Di_addr[i];
-                BitWorker.TurnBitOff(bitmap, dirNode.Di_addr[i]);
                 break;
             }
             if (blockNum < 0)
                 throw new OSException.BlockAppendException("Can't append block to dir");
             return blockNum;
+        }
+
+        public static bool WriteBlockToDir(System.IO.FileStream fs, short blockNum, int blockSize)
+        {
+            var bm = BitWorker.TurnBitOff(DataExtractor.GetBitmap(fs, 1920), blockNum);
+            fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.BITMAP);
+            FSPartsWriter.WriteBitmap(fs, bm, blockSize);
+            return true;
+        }
+
+        public static bool WriteNodeToFile(System.IO.FileStream fs, INode dirNode, short nodeNum)
+        {
+            fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.INODES) + (nodeNum - 1) *
+                OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.INODE);
+            FSPartsWriter.WriteINode(fs, dirNode);
+            return true;
         }
     }
 }

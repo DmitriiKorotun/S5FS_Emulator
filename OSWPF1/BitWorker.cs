@@ -34,8 +34,10 @@ namespace OSWPF1
         public static int ReadByte(byte myByte) //TO change name MyByte
         {
             int bitIndex = -1;
+            var temp = myByte;
             for (int i = 0; i < 8; ++i)
             {
+                myByte = temp;
                 byte mask = (byte)(1 << i);
                 myByte &= mask;
                 if (myByte == 0)
