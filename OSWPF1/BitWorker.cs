@@ -109,12 +109,13 @@ namespace OSWPF1
         public static List<short> GetFreeBits(byte myByte, int byteNum)
         {
             var addresses = new List<short>();
-
+            var temp = myByte;
             for (int i = 0; i < 8; ++i)
             {
+                temp = myByte;
                 byte mask = (byte)(1 << i);
-                myByte &= mask; //Bit AND
-                if (myByte == 0)
+                temp &= mask; //Bit AND
+                if (temp == 0)
                 {
                     addresses.Add((short)(i + 1 + byteNum * 8)); //byteNum * 8 - for global addresses, 
                     //byteNum - is a global number of byte in byte[]

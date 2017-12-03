@@ -21,7 +21,8 @@ namespace OSWPF1 //To change it completely
         {
             FILEINDIR = 20,
             INODE = 54,
-
+            GROUP = 20,
+            USER = 24
         }
 
         public static long GetPos(posGuide pos)

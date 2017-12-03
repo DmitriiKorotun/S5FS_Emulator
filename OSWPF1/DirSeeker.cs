@@ -24,21 +24,13 @@ namespace OSWPF1
                         for (int j = 0; j < block.Length - 20;
                             j += OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR))
                         {
-                            var fileInDirName = Encoding.ASCII.GetString(block, j, 16);
-                            var nextNodeNum = BitConverter.ToInt16(block, j + 16);
-                            var type = BitConverter.ToBoolean(block, j + 18);
-                            if (nextNodeNum < 1)
+                            var file = GetFile(block, j);
+                            if (file.NodeNum < 1)
                                 continue;
-                            if (type)
-                            {
-                                tree.Nodes.Add(GetFileList(nextNodeNum, blockSize, fileInDirName));
-                                //var child = GetFileList(nextNodeNum, blockSize, fileInDirName);
-                                //tree.Nodes[tree.Nodes.Count - 1].Nodes.
-                                //    Insert(tree.Nodes[tree.Nodes.Count - 1].Nodes.Count,
-                                //    GetFileList(nextNodeNum, blockSize, new System.Windows.Forms.TreeNode()));
-                            }
+                            if (file.Type)
+                                tree.Nodes.Add(GetFileList(file.NodeNum, blockSize, file.Name));
                             else
-                                tree.Nodes.Add(fileInDirName);
+                                tree.Nodes.Add(file.Name);
                         }
                     }
                 }
@@ -47,30 +39,114 @@ namespace OSWPF1
         }
 
 
+
+        public static System.Windows.Forms.TreeNode GetExtendedFileList(int nodeNum, int blockSize, string name)
+        {
+            var tree = new System.Windows.Forms.TreeNode(GetTruncatedName(name));
+
+            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            {
+                var node = DataExtractor.GetINode(fs, nodeNum);
+                tree.Text += AddPropToName(node);
+                for (int i = 0; i < node.Di_addr.Length; ++i)
+                {
+                    if (node.Di_addr[i] != 0)
+                    {
+                        var block = ByteReader.ReadBlock(fs, blockSize, OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR) +
+                            (node.Di_addr[i] - 1) * blockSize);
+                        for (int j = 0; j < block.Length - 20;
+                            j += OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR))
+                        {
+                            var file = GetFile(block, j);
+                            if (file.NodeNum < 1)
+                                continue;
+                            if (file.Type)
+                                tree.Nodes.Add(GetExtendedFileList(file.NodeNum, blockSize, file.Name));
+                            else
+                                tree.Nodes.Add(GetTruncatedName(file.Name) + AddPropToName(DataExtractor.GetINode(fs, file.NodeNum)));
+                        }
+                    }
+                }
+            }
+            return tree;
+        }
+
+        public static string GetTruncatedName(string name)
+        {
+            return name.Replace("\0", "");
+        }
+
+        public static string AddPropToName(INode node)
+        {
+            var props = " : ";
+            props += node.Flag.Type == true ? "d" : "f";
+            props += node.Flag.Hidden == true ? "h" : "v";
+            props += node.Flag.System == true ? "s " : "u ";
+            props += GetRights(node);
+            return props;
+        }
+
+        public static string GetRights(INode node)
+        {
+            var str = "";
+            var rights = node.Rights.ToString();
+            for (var i = 0; i < rights.Length; ++i)
+            {
+                var set = Convert.ToString((int)Char.GetNumericValue(rights[i]), 2);
+                while (set.Length < 3)
+                    set += "0";
+                str += set[0] == '1' ? "r" : "-";
+                str += set[1] == '1' ? "w" : "-";
+                str += set[2] == '1' ? "x" : "-";
+            }
+            return str;
+        }
+
+        public static FileInDir GetFile(byte[] block, int startIndex)
+        {
+            var file = new FileInDir();
+            file.Name = Encoding.ASCII.GetString(block, startIndex, 16);
+            file.NodeNum = BitConverter.ToInt16(block, startIndex + 16);
+            file.Type = BitConverter.ToBoolean(block, startIndex + 18);
+            return file;
+        }
+
+
+
         public static short GetNeededFileNode(System.Windows.Forms.TreeNode tree, int blockSize)
         {
-            var child = tree;
+            if (tree == null)
+                throw new NullReferenceException("Директория не выбрана");
             var treeStack = new Stack<System.Windows.Forms.TreeNode>();
             if (tree.Text == "\\")
                 return (short)SystemSigns.Signs.MAINDIRNODE;
             else
             {
-                while (child.Parent != null)
-                {
-                    treeStack.Push(child);
-                    child = child.Parent;
-                }
+                treeStack = GetNodes(tree);
+                using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+                    return GetCurrentFileNode(fs, treeStack, (short)SystemSigns.Signs.MAINDIRNODE, blockSize);
             }
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
-                return GetCurrentFileNode(fs, treeStack, (short)SystemSigns.Signs.MAINDIRNODE, blockSize);
         }
-            
+
+        public static Stack<System.Windows.Forms.TreeNode> GetNodes(System.Windows.Forms.TreeNode tree)
+        {
+            if (tree == null)
+                throw new NullReferenceException("Дерево не инициализировано");
+            var treeStack = new Stack<System.Windows.Forms.TreeNode>();
+            while (tree.Parent != null)
+            {
+                treeStack.Push(tree);
+                tree = tree.Parent;
+            }
+            return treeStack;
+        }
+
         private static short GetCurrentFileNode(System.IO.FileStream fs, Stack<System.Windows.Forms.TreeNode> treeStack, short nodeNum, int blockSize)
         {
             var branch = treeStack.Pop();
-            var newNodeNum = CheckDirForFile(fs, branch.Name, nodeNum, blockSize);
+            var newNodeNum = CheckDirForFile(fs, branch.Text, nodeNum, blockSize);
             if (newNodeNum < 0)
-                throw new OSException.FileNotFoundException("Файл с именем " + branch.Name + " не был найден");
+                throw new OSException.FileNotFoundException("Файл с именем " + branch.Text + " не был найден");
             if (treeStack.Count == 0)
                 return newNodeNum;
             else
@@ -86,7 +162,8 @@ namespace OSWPF1
                 if (node.Di_addr[i] == 0)
                     continue;
 
-                var block = ByteReader.ReadBlock(fs, blockSize);
+                var block = ByteReader.ReadBlock(fs, blockSize,
+                    OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR) + (node.Di_addr[i] - 1) * blockSize);
                 newNodeNum = FindFileNode(block, name);
 
                 if (newNodeNum > -1)
@@ -108,6 +185,16 @@ namespace OSWPF1
                 }
             }
             return fileNode;
+        }
+
+
+
+        public static bool IsDir(System.Windows.Forms.TreeNode tree, int blockSize)
+        {
+            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+                if (DataExtractor.GetINode(fs, GetNeededFileNode(tree, blockSize)).Flag.Type)
+                    return true;
+            return false;
         }
     }
 }

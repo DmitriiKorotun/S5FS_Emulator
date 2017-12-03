@@ -63,10 +63,13 @@ namespace OSWPF1
             using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open))
             {
                 var node = DataExtractor.GetINode(fs, dirNode);
+                if (!node.Flag.Type)
+                    throw new ArgumentException("Попытка записи в файл,а не папку");
                 try
                 {
                     var prepInfo = GetFileInfo(fs, ComposeInfo(name, fileNode, type), blockSize, dirNode);
-                    if (!WriteBlock(fs, prepInfo, blockSize, GetFreeBlock(fs, node.Di_addr, blockSize)))
+                    if (!WriteBlock(fs, prepInfo, blockSize, GetFreeBlock(fs, node.Di_addr, blockSize, 
+                        OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR))))
                         throw new System.IO.IOException("File dir data hasn't been written in the file");
                 }
                 catch (OSException.DirBlocksException)
@@ -89,12 +92,14 @@ namespace OSWPF1
         private static byte[] GetFileInfo(System.IO.FileStream fs, byte[] data, int blockSize, int dNodeNum)
         {
             var dirNode = DataExtractor.GetINode(fs, dNodeNum);
-            var blockNum = GetFreeBlock(fs, dirNode.Di_addr, blockSize);
+            var blockNum = GetFreeBlock(fs, dirNode.Di_addr, blockSize, 
+                OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR));
             var block = BlocksHandler.GetBlock(fs, blockSize, (short)blockNum);
-            return GetFilledBlock(block, data, GetOffset(block));
+            return GetFilledBlock(block, data, GetOffset(block, 
+                OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR)));
         }
 
-        private static int GetFreeBlock(System.IO.FileStream fs, short[] di_addr, int blockSize)
+        public static int GetFreeBlock(System.IO.FileStream fs, short[] di_addr, int blockSize, int increment)
         {
             var blockNum = -1;
             for (int i = 0; i < di_addr.Length; ++i)
@@ -102,31 +107,31 @@ namespace OSWPF1
                 if (di_addr[i] == 0)
                 {
                     if (i == di_addr.Length - 1)
-                        throw new OSException.DirBlocksException("Dir hasn't free blocks");
+                        throw new OSException.DirBlocksException("File hasn't free blocks");
                     continue;
                 }
                 var block = BlocksHandler.GetBlock(fs, blockSize, di_addr[i]);
 
-                if (GetOffset(block) > -1)
+                if (GetOffset(block, increment) > -1)
                 {
                     blockNum = di_addr[i];
                     break;
                 }
                 else if (i == di_addr.Length - 1)
-                    throw new OSException.DirBlocksException("Dir hasn't free blocks");
+                    throw new OSException.DirBlocksException("File hasn't free blocks");
             }
             return blockNum;
         }
 
-        private static int GetOffset(byte[] block)
+        public static int GetOffset(byte[] block, int increment)
         {
             var offset = -1;
-            for (int i = 0; i < block.Length / OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR); ++i)
+            for (int i = 0; i < block.Length / increment; ++i)
             {
                 bool isFree = true;
-                for (int j = 0; j < OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR); ++j)
+                for (int j = 0; j < increment; ++j)
                 {
-                    if (block[j + i * OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR)] != 0)
+                    if (block[j + i * increment] != 0)
                     {
                         isFree = false;
                         break;
@@ -134,7 +139,7 @@ namespace OSWPF1
                 }
                 if (isFree)
                 {
-                    offset = i * OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR);
+                    offset = i * increment;
                     break;
                 }
             }
@@ -205,7 +210,7 @@ namespace OSWPF1
 
         public static bool WriteBlockToDir(System.IO.FileStream fs, short blockNum, int blockSize)
         {
-            var bm = BitWorker.TurnBitOff(DataExtractor.GetBitmap(fs, 1920), blockNum);
+            var bm = BitWorker.TurnBitOn(DataExtractor.GetBitmap(fs, 1920), blockNum);
             fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.BITMAP);
             FSPartsWriter.WriteBitmap(fs, bm, blockSize);
             return true;

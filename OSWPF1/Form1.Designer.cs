@@ -37,10 +37,12 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.фСToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createFSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.delFSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.delFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.пользователиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btn_getProps = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -77,7 +79,7 @@
             this.tv_dirView.HideSelection = false;
             this.tv_dirView.Location = new System.Drawing.Point(278, 12);
             this.tv_dirView.Name = "tv_dirView";
-            this.tv_dirView.Size = new System.Drawing.Size(195, 237);
+            this.tv_dirView.Size = new System.Drawing.Size(373, 237);
             this.tv_dirView.TabIndex = 7;
             // 
             // btn_update
@@ -88,7 +90,7 @@
             this.btn_update.TabIndex = 8;
             this.btn_update.Text = "Обновить";
             this.btn_update.UseVisualStyleBackColor = true;
-            this.btn_update.Click += new System.EventHandler(this.button1_Click_1);
+            this.btn_update.Click += new System.EventHandler(this.btn_update_Click);
             // 
             // menuStrip1
             // 
@@ -98,14 +100,15 @@
             this.пользователиToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(485, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(705, 24);
             this.menuStrip1.TabIndex = 10;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // фСToolStripMenuItem
             // 
             this.фСToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.createFSToolStripMenuItem});
+            this.createFSToolStripMenuItem,
+            this.delFSToolStripMenuItem});
             this.фСToolStripMenuItem.Name = "фСToolStripMenuItem";
             this.фСToolStripMenuItem.Size = new System.Drawing.Size(36, 20);
             this.фСToolStripMenuItem.Text = "ФС";
@@ -113,9 +116,16 @@
             // createFSToolStripMenuItem
             // 
             this.createFSToolStripMenuItem.Name = "createFSToolStripMenuItem";
-            this.createFSToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.createFSToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.createFSToolStripMenuItem.Text = "Создать ФС";
             this.createFSToolStripMenuItem.Click += new System.EventHandler(this.createFSToolStripMenuItem_Click);
+            // 
+            // delFSToolStripMenuItem
+            // 
+            this.delFSToolStripMenuItem.Name = "delFSToolStripMenuItem";
+            this.delFSToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.delFSToolStripMenuItem.Text = "Удалить ФС";
+            this.delFSToolStripMenuItem.Click += new System.EventHandler(this.delFSToolStripMenuItem_Click);
             // 
             // fileToolStripMenuItem
             // 
@@ -145,11 +155,22 @@
             this.пользователиToolStripMenuItem.Size = new System.Drawing.Size(97, 20);
             this.пользователиToolStripMenuItem.Text = "Пользователи";
             // 
+            // btn_getProps
+            // 
+            this.btn_getProps.Location = new System.Drawing.Point(146, 89);
+            this.btn_getProps.Name = "btn_getProps";
+            this.btn_getProps.Size = new System.Drawing.Size(126, 23);
+            this.btn_getProps.TabIndex = 11;
+            this.btn_getProps.Text = "Получить свойства";
+            this.btn_getProps.UseVisualStyleBackColor = true;
+            this.btn_getProps.Click += new System.EventHandler(this.btn_getProps_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(485, 261);
+            this.ClientSize = new System.Drawing.Size(705, 261);
+            this.Controls.Add(this.btn_getProps);
             this.Controls.Add(this.btn_update);
             this.Controls.Add(this.tv_dirView);
             this.Controls.Add(this.btn_addGroup);
@@ -180,6 +201,8 @@
         private System.Windows.Forms.ToolStripMenuItem пользователиToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem фСToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createFSToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem delFSToolStripMenuItem;
+        private System.Windows.Forms.Button btn_getProps;
     }
 }
 

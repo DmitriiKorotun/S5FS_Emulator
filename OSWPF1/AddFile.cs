@@ -26,14 +26,41 @@ namespace OSWPF1
         {
             try
             {
-                var tv_dirView = ((Form1)this.Owner).TV_FilesView;
-                TryToWrite(tb_fullName.Text, tv_dirView.SelectedNode);
+                this.btn_add.Enabled = false;
+                this.btn_exit.Enabled = false;
+                WriteFile();
             }
             catch (ArgumentOutOfRangeException exception)
             {
                 MessageBox.Show(exception.Message, "Значение слишком большое");
             }
+            catch (NullReferenceException ex)
+            {
+                if (ex.Message == "Директория не выбрана")
+                    MessageBox.Show(ex.Message);
+                else
+                    throw ex;
+            }
+            catch (ArgumentException ex)
+            {
+                if (ex.Message == "Попытка записи в файл, а не папку")
+                    MessageBox.Show(ex.Message);
+                else
+                    throw ex;
+            }
+            finally
+            {
+                this.btn_add.Enabled = true;
+                this.btn_exit.Enabled = true;
+            }
+        }
 
+        private void WriteFile()
+        {
+            var tv_dirView = ((Form1)this.Owner).TV_FilesView;
+            if (!DirSeeker.IsDir(tv_dirView.SelectedNode, 4096)) //Make 4096 dynamic
+                throw new ArgumentException("Попытка записи в файл, а не папку");
+            TryToWrite(tb_fullName.Text, tv_dirView.SelectedNode);
         }
 
         private void btn_openFile_Click(object sender, EventArgs e)
@@ -63,7 +90,7 @@ namespace OSWPF1
                 DirHandler.WriteDir(iNode, "FS", DirSeeker.GetNeededFileNode(tree, 4096)); //Make 4096 dynamic
             else
             {
-                handler.AddFile(iNode, "FS", System.IO.File.ReadAllBytes(fullName), 1);
+                handler.AddFile(iNode, "FS", System.IO.File.ReadAllBytes(fullName), DirSeeker.GetNeededFileNode(tree, 4096));
             }
         }
 

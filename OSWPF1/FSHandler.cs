@@ -36,7 +36,7 @@ namespace OSWPF1
                     throw e;
                 }
             }
-            DirHandler.WriteDir(new INode(), "FS", 0); //Change 0 to INITDIR enum
+            DirHandler.WriteDir(new INode(SystemSigns.Signs.CREATEMAINDIR), "FS", 0); //Change 0 to INITDIR enum
         }
 
         public void AddFile(INode iNode, string path, byte[] data, short dirNode)
@@ -102,10 +102,12 @@ namespace OSWPF1
             using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
             {
                 fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR);
-                for (int i = 0; i < storage.Bitmap.BitmapValue.Length * 8; ++i)
+                for (int i = 1; i <= storage.Bitmap.BitmapValue.Length * 8; ++i)
                 {
                     if (dataKeys.Contains(i))
-                        ByteWriter.WriteBlock(fs, storage.Superblock.ClusterSize, data[i]);
+                        ByteWriter.WriteBlock(fs, 
+                            OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR) + (i - 1) * 4096, //Make 4096 dynamic
+                            storage.Superblock.ClusterSize, data[i]);
                 }
             }
         }
@@ -124,6 +126,17 @@ namespace OSWPF1
         private Dictionary<int, byte[]> GetDataDict(short[] blocks, byte[] data, int clusterSize)
         {
             return BlocksHandler.GetDataArr(blocks, data, clusterSize);
+        }
+
+
+
+        public static void DelFS()
+        {
+            var path = "FS";
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
+            else
+                throw new System.IO.FileNotFoundException();
         }
     }
 }

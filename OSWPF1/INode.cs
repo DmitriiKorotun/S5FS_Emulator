@@ -19,8 +19,28 @@ namespace OSWPF1
             Size = 0;
             GID = 1;
             UID = 1;
-            Rights = 198;
+            Rights = 777;
             Name = "\\";
+        }
+
+        public INode(SystemSigns.Signs sign)
+        {
+            if (sign == SystemSigns.Signs.CREATEMAINDIR)
+            {
+                flag = new Flags();
+                CreationDate = DateTime.Now.ToBinary();
+                ChangeDate = DateTime.Now.ToBinary();
+                Flag.Hidden = false;
+                Flag.System = true;
+                Flag.Type = true;
+                Size = 0;
+                GID = 1;
+                UID = 1;
+                Rights = 777;
+                Name = "\\";
+            }
+            else
+                throw new Exception();
         }
 
         public INode(Flags flags, long crDate, long chDate, int size, short gid, short uid, short rights, string name)
