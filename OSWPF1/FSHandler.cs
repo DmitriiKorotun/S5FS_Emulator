@@ -37,13 +37,18 @@ namespace OSWPF1
                 }
             }
             DirHandler.WriteDir(new INode(SystemSigns.Signs.CREATEMAINDIR), "FS", 0); //Change 0 to INITDIR enum
+            AddFile(new INode(SystemSigns.Signs.CREATEGROUPFILE), null, 1);
+            AddFile(new INode(SystemSigns.Signs.CREATEUSERFILE), null, 1);
+            AddFile(new INode(SystemSigns.Signs.CREATEBANNEDFILE), null, 1);
+            GroupPolicy.WriteGroup("Admins");
+            GroupPolicy.WriteUser("Admin", "root", 1);
         }
 
-        public void AddFile(INode iNode, string path, byte[] data, short dirNode)
+        public void AddFile(INode iNode, byte[] data, short dirNode)
         {
-            var storage = DataExtractor.GetData(path);
+            var storage = DataExtractor.GetData("FS");
             DirHandler.AddFileToDir(iNode.Name, storage.Superblock.ClusterSize, dirNode,
-                CommitFile(storage, iNode, path, data), iNode.Flag.Type);
+                CommitFile(storage, iNode, "FS", data), iNode.Flag.Type);
         }
 
         public short CommitFile(FileDataStorage storage, INode iNode, string path, byte[] data)

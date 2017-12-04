@@ -20,9 +20,10 @@ namespace OSWPF1 //To change it completely
         public enum sizeGuide : int
         {
             FILEINDIR = 20,
-            INODE = 54,
-            GROUP = 20,
-            USER = 24
+            INODE = 56,
+            GROUP = 18,
+            USER = 36,
+            BANNED = 2
         }
 
         public static long GetPos(posGuide pos)

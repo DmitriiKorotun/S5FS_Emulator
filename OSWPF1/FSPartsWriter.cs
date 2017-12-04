@@ -70,6 +70,7 @@ namespace OSWPF1
                 for (int j = 0; j < iNodes[i].Di_addr.Length; ++j)
                     fs.Write(BitConverter.GetBytes(iNodes[i].Di_addr[j]), 0, BitConverter.GetBytes(iNodes[i].Di_addr[j]).Length);
                 bytesWritten += INode.Offset; //54 is the size of one INode
+                fs.Write(BitConverter.GetBytes(iNodes[i].Rights), 0, BitConverter.GetBytes(iNodes[i].Rights).Length);
             }
             return bytesWritten;
         }
@@ -91,6 +92,8 @@ namespace OSWPF1
             for (int j = 0; j < iNode.Di_addr.Length; ++j)
                 fs.Write(BitConverter.GetBytes(iNode.Di_addr[j]), 0, BitConverter.GetBytes(iNode.Di_addr[j]).Length);
             bytesWritten += INode.Offset;
+
+            fs.Write(BitConverter.GetBytes(iNode.Rights), 0, BitConverter.GetBytes(iNode.Rights).Length);
 
             return bytesWritten;
         }

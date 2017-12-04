@@ -39,6 +39,48 @@ namespace OSWPF1
                 Rights = 777;
                 Name = "\\";
             }
+            else if (sign == SystemSigns.Signs.CREATEGROUPFILE)
+            {
+                flag = new Flags();
+                CreationDate = DateTime.Now.ToBinary();
+                ChangeDate = DateTime.Now.ToBinary();
+                Flag.Hidden = true;
+                Flag.System = true;
+                Flag.Type = false;
+                Size = 0;
+                GID = 1;
+                UID = 1;
+                Rights = 770;
+                Name = "groups";
+            }
+            else if (sign == SystemSigns.Signs.CREATEUSERFILE)
+            {
+                flag = new Flags();
+                CreationDate = DateTime.Now.ToBinary();
+                ChangeDate = DateTime.Now.ToBinary();
+                Flag.Hidden = true;
+                Flag.System = true;
+                Flag.Type = false;
+                Size = 0;
+                GID = 1;
+                UID = 1;
+                Rights = 770;
+                Name = "users";
+            }
+            else if (sign == SystemSigns.Signs.CREATEBANNEDFILE)
+            {
+                flag = new Flags();
+                CreationDate = DateTime.Now.ToBinary();
+                ChangeDate = DateTime.Now.ToBinary();
+                Flag.Hidden = true;
+                Flag.System = true;
+                Flag.Type = false;
+                Size = 0;
+                GID = 1;
+                UID = 1;
+                Rights = 770;
+                Name = "banned";
+            }
             else
                 throw new Exception();
         }
@@ -105,7 +147,7 @@ namespace OSWPF1
         static int offset;
         public static int Offset
         {
-            get { return 54; } //x17 short + x1 int + x3(4) bool + x2 long; 55?
+            get { return 56; } //x17 short + x1 int + x3(4) bool + x2 long; 55?
         }
 
         int size;

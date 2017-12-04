@@ -51,6 +51,30 @@
     <Compile Include="AddFile.Designer.cs">
       <DependentUpon>AddFile.cs</DependentUpon>
     </Compile>
+    <Compile Include="AddGroup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddGroup.Designer.cs">
+      <DependentUpon>AddGroup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddUser.Designer.cs">
+      <DependentUpon>AddUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Authorization.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Authorization.Designer.cs">
+      <DependentUpon>Authorization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BanUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BanUser.Designer.cs">
+      <DependentUpon>BanUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Bitmap.cs" />
     <Compile Include="BitWorker.cs" />
     <Compile Include="BlocksHandler.cs" />
@@ -71,11 +95,11 @@
     <Compile Include="Helper.cs" />
     <Compile Include="IniHandler.cs" />
     <Compile Include="INode.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ISystemCalls.cs" />
     <Compile Include="Logger.cs" />
@@ -91,8 +115,20 @@
     <EmbeddedResource Include="AddFile.resx">
       <DependentUpon>AddFile.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="AddGroup.resx">
+      <DependentUpon>AddGroup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddUser.resx">
+      <DependentUpon>AddUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Authorization.resx">
+      <DependentUpon>Authorization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BanUser.resx">
+      <DependentUpon>BanUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

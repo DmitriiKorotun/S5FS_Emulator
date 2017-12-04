@@ -186,25 +186,25 @@ namespace OSWPF1
 
         public static short SetNewDirBlock(System.IO.FileStream fs, ref INode node, int blockSize, short nodeNum)
         {
-            var blockNum = AppendBlockToDir(ref node, DataExtractor.GetBitmap(fs, 1920));
+            var blockNum = AppendBlockToFile(ref node, DataExtractor.GetBitmap(fs, 1920));
             if(!WriteBlockToDir(fs, blockNum, blockSize) || !WriteNodeToFile(fs, node, nodeNum))
                 throw new Exception();
             return blockNum;
         }
 
-        public static short AppendBlockToDir(ref INode dirNode, byte[] bitmap)
+        public static short AppendBlockToFile(ref INode node, byte[] bitmap)
         {
             short blockNum = -1;
-            for (int i = 0; i < dirNode.Di_addr.Length; ++i)
+            for (int i = 0; i < node.Di_addr.Length; ++i)
             {
-                if (dirNode.Di_addr[i] != 0)
+                if (node.Di_addr[i] != 0)
                     continue;
-                dirNode.Di_addr[i] = (short)BitWorker.GetFirstFree(bitmap);
-                blockNum = dirNode.Di_addr[i];
+                node.Di_addr[i] = (short)BitWorker.GetFirstFree(bitmap);
+                blockNum = node.Di_addr[i];
                 break;
             }
             if (blockNum < 0)
-                throw new OSException.BlockAppendException("Can't append block to dir");
+                throw new OSException.BlockAppendException("Can't append block to file");
             return blockNum;
         }
 

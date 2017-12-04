@@ -11,7 +11,10 @@ namespace OSWPF1
         public enum Signs : int
         {
             CREATEMAINDIR = 0,
-            MAINDIRNODE = 1
+            MAINDIRNODE = 1,
+            CREATEUSERFILE = 255,
+            CREATEGROUPFILE = 256,
+            CREATEBANNEDFILE = 257
         };
     }
 }

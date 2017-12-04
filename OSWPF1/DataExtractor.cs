@@ -112,6 +112,7 @@ namespace OSWPF1
                 bytePos += 2;
                 node.Di_addr[i] = BitConverter.ToInt16(addrBlock, 0);
             }
+            node.Rights = BitConverter.ToInt16(nodeInBytes, 54);
 
             return node;
         }

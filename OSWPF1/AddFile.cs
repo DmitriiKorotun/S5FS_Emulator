@@ -15,6 +15,17 @@ namespace OSWPF1
         public AddFile()
         {
             InitializeComponent();
+            check_uRead.Checked = true;
+            check_uWrite.Checked = true;
+            check_uEx.Checked = true;
+
+            check_gRead.Checked = true;
+            check_gWrite.Checked = true;
+            check_gEx.Checked = true;
+
+            check_aRead.Checked = true;
+            check_aWrite.Checked = true;
+            check_aEx.Checked = true;
         }
 
         private void btn_exit_Click(object sender, EventArgs e)
@@ -24,43 +35,66 @@ namespace OSWPF1
 
         private void btn_add_Click(object sender, EventArgs e)
         {
-            try
+            TryToAddFile();
+        }
+
+        private void TryToAddFile()
+        {
+            if (!IsAllCompleted())
+                MessageBox.Show("Вы заполнили не всю необходимую информацию");
+            else
             {
-                this.btn_add.Enabled = false;
-                this.btn_exit.Enabled = false;
-                WriteFile();
+                try
+                {
+                    this.btn_add.Enabled = false;
+                    this.btn_exit.Enabled = false;
+                    WriteFile();
+                }
+                catch (ArgumentOutOfRangeException exception)
+                {
+                    MessageBox.Show(exception.Message, "Значение слишком большое");
+                }
+                catch (NullReferenceException ex)
+                {
+                    if (ex.Message == "Директория не выбрана")
+                        MessageBox.Show(ex.Message);
+                    else
+                        throw ex;
+                }
+                catch (ArgumentException ex)
+                {
+                    if (ex.Message == "Попытка записи в файл, а не папку")
+                        MessageBox.Show(ex.Message);
+                    else
+                        throw ex;
+                }
+                finally
+                {
+                    this.btn_add.Enabled = true;
+                    this.btn_exit.Enabled = true;
+                }
             }
-            catch (ArgumentOutOfRangeException exception)
-            {
-                MessageBox.Show(exception.Message, "Значение слишком большое");
-            }
-            catch (NullReferenceException ex)
-            {
-                if (ex.Message == "Директория не выбрана")
-                    MessageBox.Show(ex.Message);
-                else
-                    throw ex;
-            }
-            catch (ArgumentException ex)
-            {
-                if (ex.Message == "Попытка записи в файл, а не папку")
-                    MessageBox.Show(ex.Message);
-                else
-                    throw ex;
-            }
-            finally
-            {
-                this.btn_add.Enabled = true;
-                this.btn_exit.Enabled = true;
-            }
+        }
+
+        private bool IsAllCompleted()
+        {
+            var everythingIsOK = true;
+            if (tb_name.Text == "")
+                everythingIsOK = false;
+            if (rtb_data.Text == "" && (tb_fullpath.Text == "" || num_size.Value == 0))
+                everythingIsOK = false;
+            return everythingIsOK;
         }
 
         private void WriteFile()
         {
-            var tv_dirView = ((Form1)this.Owner).TV_FilesView;
+            var tv_dirView = ((MainForm)this.Owner).TV_FilesView;
             if (!DirSeeker.IsDir(tv_dirView.SelectedNode, 4096)) //Make 4096 dynamic
                 throw new ArgumentException("Попытка записи в файл, а не папку");
-            TryToWrite(tb_fullName.Text, tv_dirView.SelectedNode);
+            if (tb_fullpath.Text != "")
+                WriteExisting(tb_fullpath.Text, tv_dirView.SelectedNode);
+            else
+                WriteRaw(rtb_data.Text, tv_dirView.SelectedNode);
         }
 
         private void btn_openFile_Click(object sender, EventArgs e)
@@ -68,10 +102,31 @@ namespace OSWPF1
             ChoseFile();
         }
 
-        private void TryToWrite(string fullName, TreeNode tree)
+        private void WriteExisting(string fullName, TreeNode tree)
         {
             if (fullName == "")
                 throw new Exception("Файл не выбран");
+            var iNode = GetINodeInfo();
+            var handler = new FSHandler();
+            handler.AddFile(iNode, System.IO.File.ReadAllBytes(fullName), DirSeeker.GetNeededFileNode(tree, 4096));
+        }
+
+        private void WriteRaw(string text, TreeNode tree)
+        {
+            var iNode = GetINodeInfo();
+            if (text == "" && !iNode.Flag.Type)
+                throw new Exception("Данные не введены");
+            var handler = new FSHandler();
+            if (iNode.Flag.Type == true)
+                DirHandler.WriteDir(iNode, "FS", DirSeeker.GetNeededFileNode(tree, 4096)); //Make 4096 dynamic
+            else
+            {
+                handler.AddFile(iNode, Encoding.ASCII.GetBytes(text), DirSeeker.GetNeededFileNode(tree, 4096));
+            }
+        }
+
+        private INode GetINodeInfo()
+        {
             var iNode = new INode();
             byte[] ftype = Encoding.ASCII.GetBytes(DateWorker.GetDate(DateTime.Now.Date));
             iNode.CreationDate = BitConverter.ToInt64(ftype, 0);
@@ -83,15 +138,43 @@ namespace OSWPF1
             iNode.Size = (int)num_size.Value * 1024;
             iNode.GID = 1;
             iNode.UID = 1;
-            iNode.Rights = 198;
-            iNode.Name = tb_filename.Text;
-            var handler = new FSHandler();
-            if (iNode.Flag.Type == true)
-                DirHandler.WriteDir(iNode, "FS", DirSeeker.GetNeededFileNode(tree, 4096)); //Make 4096 dynamic
-            else
-            {
-                handler.AddFile(iNode, "FS", System.IO.File.ReadAllBytes(fullName), DirSeeker.GetNeededFileNode(tree, 4096));
-            }
+            iNode.Rights = GetRights();
+            iNode.Name = tb_name.Text;
+            return iNode;
+        }
+
+        private short GetRights()
+        {
+            var rights = 0;
+            var strRights = "";
+            if (check_uRead.Checked)
+                rights += 4;
+            if (check_uWrite.Checked)
+                rights += 2;
+            if (check_uEx.Checked)
+                rights += 1;
+            strRights = rights.ToString();
+            rights = 0;
+
+            if (check_gRead.Checked)
+                rights += 4;
+            if (check_gWrite.Checked)
+                rights += 2;
+            if (check_gEx.Checked)
+                rights += 1;
+            strRights += rights.ToString();
+            rights = 0;
+
+            if (check_aRead.Checked)
+                rights += 4;
+            if (check_aWrite.Checked)
+                rights += 2;
+            if (check_gEx.Checked)
+                rights += 1;
+            strRights += rights.ToString();
+            rights = 0;
+
+            return Int16.Parse(strRights);
         }
 
         private void ChoseFile()
@@ -104,19 +187,11 @@ namespace OSWPF1
                     MessageBox.Show("Размер файла слишком большой", "Ошибка");
                 else
                 {
-                    SetValue(tb_filename, fileInfo.Name);
+                    SetValue(tb_name, fileInfo.Name);
                     SetValue(num_size, fileInfo.Length / 1024);
-                    SetValue(tb_fullName, fileInfo.FullName);
+                    SetValue(tb_fullpath, fileInfo.FullName);
                 }
             }
-        }
-
-        private bool isAllCompeted()
-        {
-            if (tb_filename.Text != "" && num_size.Value != 0 && cbox_user.Text != "")
-                return true;
-            else
-                return false;
         }
 
         private void SetValue<T>(T control, string value) where T: Control
@@ -127,6 +202,17 @@ namespace OSWPF1
         private void SetValue(NumericUpDown numeric, long value)
         {
             numeric.Value = value;
+        }
+
+        private void btn_reset_Click(object sender, EventArgs e)
+        {
+            ResetExisting();
+        }
+
+        private void ResetExisting()
+        {
+            tb_fullpath.Text = "";
+            num_size.Value = 0;
         }
     }
 }
