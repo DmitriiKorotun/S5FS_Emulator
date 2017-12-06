@@ -63,11 +63,11 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.lay_fileAttribs = new System.Windows.Forms.FlowLayoutPanel();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+            this.btn_reset = new System.Windows.Forms.Button();
             this.rtb_data = new System.Windows.Forms.RichTextBox();
             this.lay_data = new System.Windows.Forms.FlowLayoutPanel();
             this.lbl_data = new System.Windows.Forms.Label();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
-            this.btn_reset = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.num_size)).BeginInit();
             this.lay_flags.SuspendLayout();
             this.lay_name.SuspendLayout();
@@ -140,7 +140,7 @@
             this.num_size.InterceptArrowKeys = false;
             this.num_size.Location = new System.Drawing.Point(58, 3);
             this.num_size.Maximum = new decimal(new int[] {
-            8240,
+            8437760,
             0,
             0,
             0});
@@ -438,6 +438,16 @@
             this.flowLayoutPanel2.Size = new System.Drawing.Size(194, 54);
             this.flowLayoutPanel2.TabIndex = 36;
             // 
+            // btn_reset
+            // 
+            this.btn_reset.Location = new System.Drawing.Point(98, 29);
+            this.btn_reset.Name = "btn_reset";
+            this.btn_reset.Size = new System.Drawing.Size(89, 23);
+            this.btn_reset.TabIndex = 16;
+            this.btn_reset.Text = "Сбросить";
+            this.btn_reset.UseVisualStyleBackColor = true;
+            this.btn_reset.Click += new System.EventHandler(this.btn_reset_Click);
+            // 
             // rtb_data
             // 
             this.rtb_data.Location = new System.Drawing.Point(3, 16);
@@ -473,16 +483,6 @@
             this.flowLayoutPanel3.Name = "flowLayoutPanel3";
             this.flowLayoutPanel3.Size = new System.Drawing.Size(197, 197);
             this.flowLayoutPanel3.TabIndex = 40;
-            // 
-            // btn_reset
-            // 
-            this.btn_reset.Location = new System.Drawing.Point(98, 29);
-            this.btn_reset.Name = "btn_reset";
-            this.btn_reset.Size = new System.Drawing.Size(89, 23);
-            this.btn_reset.TabIndex = 16;
-            this.btn_reset.Text = "Сбросить";
-            this.btn_reset.UseVisualStyleBackColor = true;
-            this.btn_reset.Click += new System.EventHandler(this.btn_reset_Click);
             // 
             // AddFile
             // 

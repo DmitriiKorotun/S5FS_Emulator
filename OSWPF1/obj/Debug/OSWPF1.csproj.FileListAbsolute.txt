@@ -12,7 +12,6 @@ C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWP
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.pdb
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.csprojResolveAssemblyReference.cache
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.AddFile.resources
-C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.Form1.resources
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.Properties.Resources.resources
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.csproj.GenerateResource.Cache
 C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\bin\Debug\OSWPF1.exe
@@ -23,3 +22,9 @@ C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.Authorizatio
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.MainForm.resources
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.AddUser.resources
 C:\Users\Дмитрий\source\repos\OSWPF1\OSWPF1\obj\Debug\OSWPF1.BanUser.resources
+C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.AddGroup.resources
+C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.AddUser.resources
+C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.Authorization.resources
+C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.BanUser.resources
+C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.MainForm.resources
+C:\Users\Дмитрий\Documents\Visual Studio 2015\Projects\S5FS_Emulator\OSWPF1\obj\Debug\OSWPF1.RigthsChange.resources

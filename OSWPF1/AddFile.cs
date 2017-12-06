@@ -12,9 +12,12 @@ namespace OSWPF1
 {
     public partial class AddFile : Form
     {
-        public AddFile()
+        short uid;
+
+        public AddFile(short id)
         {
             InitializeComponent();
+            uid = id;
             check_uRead.Checked = true;
             check_uWrite.Checked = true;
             check_uEx.Checked = true;
@@ -121,8 +124,11 @@ namespace OSWPF1
                 DirHandler.WriteDir(iNode, "FS", DirSeeker.GetNeededFileNode(tree, 4096)); //Make 4096 dynamic
             else
             {
-                handler.AddFile(iNode, Encoding.ASCII.GetBytes(text), DirSeeker.GetNeededFileNode(tree, 4096));
+                var data = Encoding.ASCII.GetBytes(text);
+                iNode.Size = data.Length;
+                handler.AddFile(iNode, data, DirSeeker.GetNeededFileNode(tree, 4096));
             }
+                
         }
 
         private INode GetINodeInfo()
@@ -135,9 +141,9 @@ namespace OSWPF1
             iNode.Flag.Hidden = chb_hidden.Checked;
             iNode.Flag.System = chb_system.Checked;
             iNode.Flag.Type = chb_dir.Checked;
-            iNode.Size = (int)num_size.Value * 1024;
-            iNode.GID = 1;
-            iNode.UID = 1;
+            iNode.Size = (int)num_size.Value;
+            iNode.GID = GroupPolicy.GetUserGID(uid);
+            iNode.UID = uid;
             iNode.Rights = GetRights();
             iNode.Name = tb_name.Text;
             return iNode;
@@ -183,12 +189,12 @@ namespace OSWPF1
             {
                 var fileInfo = new System.IO.FileInfo(ofd_addFile.FileName);
 
-                if (fileInfo.Length / 1024 > num_size.Maximum)
+                if (fileInfo.Length > num_size.Maximum)
                     MessageBox.Show("Размер файла слишком большой", "Ошибка");
                 else
                 {
                     SetValue(tb_name, fileInfo.Name);
-                    SetValue(num_size, fileInfo.Length / 1024);
+                    SetValue(num_size, fileInfo.Length);
                     SetValue(tb_fullpath, fileInfo.FullName);
                 }
             }

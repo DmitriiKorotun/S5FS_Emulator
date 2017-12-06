@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Timers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace OSWPF1
 {
@@ -30,6 +32,20 @@ namespace OSWPF1
         public class FileNotFoundException : Exception
         {
             public FileNotFoundException(string message) : base(message)
+            {
+            }
+        }
+
+        public class AccessException : Exception
+        {
+            public AccessException(string message) : base(message)
+            {
+            }
+        }
+
+        public class SystemDeleteException : Exception
+        {
+            public SystemDeleteException(string message) : base(message)
             {
             }
         }

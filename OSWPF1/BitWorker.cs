@@ -31,6 +31,19 @@ namespace OSWPF1
             return arr;
         }
 
+        public static bool IsBitOn(byte myByte, int bitNum)
+        {
+            bool isOn;
+            byte mask = (byte)(1 << bitNum);
+            mask = (byte)~mask;
+            myByte &= mask;
+            if (myByte == 0)
+                isOn = false;
+            else
+                isOn = true;
+            return isOn;
+        }
+
         public static int ReadByte(byte myByte) //TO change name MyByte
         {
             int bitIndex = -1;

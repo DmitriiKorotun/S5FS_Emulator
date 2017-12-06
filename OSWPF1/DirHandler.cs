@@ -12,7 +12,13 @@ namespace OSWPF1
         {
             var storage = DataExtractor.GetData(path);
             var nodeNum = PrepDirData(ref iNode, ref storage, path);
-            WriteDir(System.IO.File.OpenWrite(path), iNode, storage, nodeNum);
+            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+            {
+                throw new System.IO.IOException();
+            }
+            using (System.IO.FileStream fs = System.IO.File.OpenWrite("FS"))
+                WriteDir(fs, iNode, storage, nodeNum);
+                
             if (dirNode != (short)SystemSigns.Signs.CREATEMAINDIR)
                 DirHandler.AddFileToDir(iNode.Name, storage.Superblock.ClusterSize, dirNode,
                 nodeNum, iNode.Flag.Type);
@@ -41,14 +47,11 @@ namespace OSWPF1
 
         private static void WriteDir(System.IO.FileStream fs, INode iNode, FileDataStorage storage, int nodeNum)
         {
-            using (fs)
-            {
                 fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.BITMAP);
                 FSPartsWriter.WriteBitmap(fs, storage.Bitmap, storage.Superblock.ClusterSize);
                 FSPartsWriter.WriteBitmap(fs, storage.INodeMap, storage.Superblock.ClusterSize);
                 fs.Position += INode.Offset * (nodeNum - 1);
                 FSPartsWriter.WriteINode(fs, iNode);
-            }
         }
 
 
@@ -60,6 +63,10 @@ namespace OSWPF1
 
         private static void PrepFileToDir(string name, int blockSize, short dirNode, short fileNode, bool type)
         {
+            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+            {
+                throw new System.IO.IOException();
+            }
             using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open))
             {
                 var node = DataExtractor.GetINode(fs, dirNode);

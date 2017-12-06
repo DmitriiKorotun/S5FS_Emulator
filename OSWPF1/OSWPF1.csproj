@@ -82,6 +82,7 @@
     <Compile Include="ByteReader.cs" />
     <Compile Include="DataExtractor.cs" />
     <Compile Include="DateWorker.cs" />
+    <Compile Include="DiagTools.cs" />
     <Compile Include="DirHandler.cs" />
     <Compile Include="DirSeeker.cs" />
     <Compile Include="FileInDir.cs" />
@@ -107,6 +108,12 @@
     <Compile Include="OffsetHandbook.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RigthsChange.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RigthsChange.Designer.cs">
+      <DependentUpon>RigthsChange.cs</DependentUpon>
+    </Compile>
     <Compile Include="Superblock.cs" />
     <Compile Include="ByteWriter.cs" />
     <Compile Include="SystemCalls.cs" />
@@ -139,6 +146,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="RigthsChange.resx">
+      <DependentUpon>RigthsChange.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

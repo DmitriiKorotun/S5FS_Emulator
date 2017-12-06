@@ -19,16 +19,23 @@ namespace OSWPF1
             set { isTreeExtended = value; }
         }
 
+        short currUid;
+        private short CurrUid
+        {
+            get { return currUid; }
+        }
+
         public MainForm(short uid)
         {
             InitializeComponent();
-            lbl_name.Text = GroupPolicy.GetUser(uid);
+            currUid = uid;
+            lbl_name.Text = GroupPolicy.GetUser(currUid);
             UpdateFSView(tv_dirView);
         }
 
         public TreeView TV_FilesView
         {
-               get { return tv_dirView; }
+            get { return tv_dirView; }
         }
 
         private void btn_exit_Click(object sender, EventArgs e)
@@ -69,7 +76,7 @@ namespace OSWPF1
         {
             try
             {
-                var addFileForm = new AddFile();
+                var addFileForm = new AddFile(CurrUid);
                 addFileForm.ShowDialog(this);
             }
             catch (NullReferenceException e)
@@ -122,7 +129,7 @@ namespace OSWPF1
         private void Update(TreeView view)
         {
             view.Nodes.Clear();
-            view.Nodes.Add(DirSeeker.GetFileList(1, 4096, "\\"));
+            view.Nodes.Add(DirSeeker.GetFileList(1, 4096, "\\", CurrUid, GroupPolicy.GetUserGID(CurrUid)));
         }
 
         private void UpdateExtendedFSView(TreeView view)
@@ -151,16 +158,16 @@ namespace OSWPF1
         private void UpdateExtended(TreeView view)
         {
             view.Nodes.Clear();
-            view.Nodes.Add(DirSeeker.GetExtendedFileList(1, 4096, "\\"));
+            view.Nodes.Add(DirSeeker.GetExtendedFileList(1, 4096, "\\", CurrUid, GroupPolicy.GetUserGID(CurrUid)));
         }
 
         private void ResetSelected(TreeView view, TreeNode node)
         {
-                var nodeStack = DirSeeker.GetNodes(node);
-                if (nodeStack.Count == 0)
-                    view.SelectedNode = view.Nodes[view.Nodes.Count - 1];
-                else
-                    view.SelectedNode = GetPrevSelected(nodeStack, view.Nodes[view.Nodes.Count - 1]);
+            var nodeStack = DirSeeker.GetNodes(node);
+            if (nodeStack.Count == 0)
+                view.SelectedNode = view.Nodes[view.Nodes.Count - 1];
+            else
+                view.SelectedNode = GetPrevSelected(nodeStack, view.Nodes[view.Nodes.Count - 1]);
         }
 
         private TreeNode GetPrevSelected(Stack<TreeNode> nodeStack, TreeNode node)
@@ -197,10 +204,11 @@ namespace OSWPF1
             foreach (TreeNode child in node.Nodes)
             {
                 var unifiedName = DirSeeker.GetTruncatedName(child.Text);
-                if (currNode.Text.Length >= unifiedName.Length)
+                var tempNodeText = currNode.Text;
+                if (tempNodeText.Length >= unifiedName.Length)
                 {
-                    currNode.Text = currNode.Text.Remove(unifiedName.Length, currNode.Text.Length - unifiedName.Length);
-                    if (currNode.Text == unifiedName)
+                    tempNodeText = tempNodeText.Remove(unifiedName.Length, tempNodeText.Length - unifiedName.Length);
+                    if (tempNodeText == unifiedName)
                     {
                         if (nodeStack.Count == 0)
                             neededNode = child;
@@ -209,7 +217,6 @@ namespace OSWPF1
                         break;
                     }
                 }
-
             }
             return neededNode;
         }
@@ -230,6 +237,136 @@ namespace OSWPF1
         {
             var banUser = new BanUser();
             banUser.ShowDialog(this);
+        }
+
+        private void delFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var storage = DataExtractor.GetData("FS");
+                var nodeNum = DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode, storage.Superblock.ClusterSize);
+                if (DirSeeker.IsDir(tv_dirView.SelectedNode, storage.Superblock.ClusterSize))
+                    FileCleaner.DelDir(storage, nodeNum, CurrUid, GroupPolicy.GetUserGID(currUid));
+                else
+                    FileCleaner.DelOneFile(storage, storage.Superblock.ClusterSize, nodeNum,
+                        DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode.Parent, storage.Superblock.ClusterSize),
+                        CurrUid, GroupPolicy.GetUserGID(currUid));
+                UpdateFSView(tv_dirView);
+            }
+            catch (OSException.AccessException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            catch (OSException.SystemDeleteException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void getFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                GetFile();
+            }
+            catch (OSException.AccessException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void GetFile()
+        {
+            UpdateFSView(tv_dirView);
+            var name = DirSeeker.GetTruncatedName(tv_dirView.SelectedNode.Text);
+            using (System.IO.FileStream output = System.IO.File.OpenWrite(name))
+            {
+                long bytesWritten = 0;
+                if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+                {
+                    throw new System.IO.IOException();
+                }
+                var nodeNum = DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode, 4096);
+                if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+                {
+                    throw new System.IO.IOException();
+                }
+                using (System.IO.FileStream input = System.IO.File.Open("FS", System.IO.FileMode.Open))
+                {
+                    var node = DataExtractor.GetINode(input, nodeNum);
+                    if (DirSeeker.IfCan(node, SystemSigns.Signs.READ, currUid, GroupPolicy.GetUserGID(currUid)))
+                    {
+                        for (var i = 0; i < node.Di_addr.Length - 1; ++i)
+                        {
+                            if (node.Di_addr[i] == 0)
+                                continue;
+                            var block = ByteReader.ReadBlock(input, 4096,
+                                (long)OffsetHandbook.posGuide.MAINDIR + (node.Di_addr[i] - 1) * 4096);
+                            bytesWritten += ByteWriter.WriteOutputBlock(output, block);
+                        }
+                        if (node.Di_addr[node.Di_addr.Length - 1] != 0)
+                        {
+                            var block = ByteReader.ReadBlock(input, 4096,
+                                (long)OffsetHandbook.posGuide.MAINDIR +
+                                (node.Di_addr[node.Di_addr.Length - 1] - 1) * 4096);
+                            if (BlocksHandler.GetOverallBlocks(node.Size, 4096) > 13)
+                            {
+                                for (var i = 0; i < block.Length - 1; i += 2)
+                                {
+                                    var blockNum = BitConverter.ToInt16(block, i);
+                                    if (blockNum == 0)
+                                        continue;
+                                    if (blockNum == 108)
+                                    {
+                                        var w = 0;
+                                    }
+                                    var dataBlock = ByteReader.ReadBlock(input, 4096,
+                                        (long)OffsetHandbook.posGuide.MAINDIR + (blockNum - 1) * 4096);
+                                    if (node.Size - bytesWritten < 4096)
+                                    {
+                                        var j = 0;
+                                        while (bytesWritten < node.Size)
+                                        {
+                                            output.WriteByte(dataBlock[j]);
+                                            ++j;
+                                            ++bytesWritten;
+                                        }
+                                    }
+                                    else
+                                        bytesWritten += ByteWriter.WriteOutputBlock(output, dataBlock);
+                                }
+                            }
+                            else
+                            {
+                                if (node.Size - bytesWritten < 4096)
+                                {
+                                    var j = 0;
+                                    while (bytesWritten < node.Size)
+                                    {
+                                        output.WriteByte(block[j]);
+                                        ++j;
+                                        ++bytesWritten;
+                                    }
+                                }
+                                else
+                                    ByteWriter.WriteBlock(output, 4096, block);
+                            }
+                        }
+                    }
+                    else
+                        throw new OSException.AccessException("У вас недостаточно прав для выполнения данной операции");
+                }
+            }
+        }
+
+        private void logoutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+        }
+
+        private void changeRightsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }

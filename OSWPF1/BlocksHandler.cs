@@ -25,6 +25,11 @@ namespace OSWPF1
             return BitWorker.GetFreeBits(bitmap.BitmapValue, blockNum);
         }
 
+        public static int GetOverallBlocks(int filesize, int blockSize)
+        {
+            return GetBlocksNum(BlocksForFile(blockSize, filesize), blockSize);
+        }
+
         // Returnes num of blocks needed to write the file
         static int GetBlocksNum(int blocksNum, int blockSize)
         {
@@ -40,6 +45,7 @@ namespace OSWPF1
                 //blocksNeeded = blocks used to store fileData + blocks used to store blocks adresses
             }
             return blocksNeeded;
+            //return blocksNum;
         }
 
         // Returnes num of blocks needed to write the addresses
@@ -77,7 +83,12 @@ namespace OSWPF1
             //Writes data into the following blocks
             for (int i = startDataBlocks + addressBlocks; i < freeBlocks.Length; ++i)
             {
-                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize], data, i * blockSize));
+                if (i == freeBlocks.Length - 1)
+                {
+                    var kek = 0;
+                }
+                    
+                dataToWrite.Add(freeBlocks[i], WriteBlock(new byte[blockSize], data, (i - 1) * blockSize));
             }
             return dataToWrite;
         }

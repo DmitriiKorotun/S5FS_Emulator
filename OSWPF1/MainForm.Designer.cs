@@ -47,6 +47,9 @@
             this.btn_getProps = new System.Windows.Forms.Button();
             this.lbl_currUser = new System.Windows.Forms.Label();
             this.lbl_name = new System.Windows.Forms.Label();
+            this.getFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeRightsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -97,20 +100,20 @@
             this.createFSToolStripMenuItem,
             this.delFSToolStripMenuItem});
             this.фСToolStripMenuItem.Name = "фСToolStripMenuItem";
-            this.фСToolStripMenuItem.Size = new System.Drawing.Size(36, 20);
+            this.фСToolStripMenuItem.Size = new System.Drawing.Size(33, 20);
             this.фСToolStripMenuItem.Text = "ФС";
             // 
             // createFSToolStripMenuItem
             // 
             this.createFSToolStripMenuItem.Name = "createFSToolStripMenuItem";
-            this.createFSToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.createFSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.createFSToolStripMenuItem.Text = "Создать ФС";
             this.createFSToolStripMenuItem.Click += new System.EventHandler(this.createFSToolStripMenuItem_Click);
             // 
             // delFSToolStripMenuItem
             // 
             this.delFSToolStripMenuItem.Name = "delFSToolStripMenuItem";
-            this.delFSToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.delFSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.delFSToolStripMenuItem.Text = "Удалить ФС";
             this.delFSToolStripMenuItem.Click += new System.EventHandler(this.delFSToolStripMenuItem_Click);
             // 
@@ -118,44 +121,48 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addFileToolStripMenuItem,
-            this.delFileToolStripMenuItem});
+            this.delFileToolStripMenuItem,
+            this.getFileToolStripMenuItem,
+            this.changeRightsToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(45, 20);
             this.fileToolStripMenuItem.Text = "Файл";
             // 
             // addFileToolStripMenuItem
             // 
             this.addFileToolStripMenuItem.Name = "addFileToolStripMenuItem";
-            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.addFileToolStripMenuItem.Text = "Добавить файл";
             this.addFileToolStripMenuItem.Click += new System.EventHandler(this.addFileToolStripMenuItem_Click);
             // 
             // delFileToolStripMenuItem
             // 
             this.delFileToolStripMenuItem.Name = "delFileToolStripMenuItem";
-            this.delFileToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.delFileToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.delFileToolStripMenuItem.Text = "Удалить файл";
+            this.delFileToolStripMenuItem.Click += new System.EventHandler(this.delFileToolStripMenuItem_Click);
             // 
             // usersToolStripMenuItem
             // 
             this.usersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addUserToolStripMenuItem,
-            this.banUserToolStripMenuItem});
+            this.banUserToolStripMenuItem,
+            this.logoutToolStripMenuItem});
             this.usersToolStripMenuItem.Name = "usersToolStripMenuItem";
-            this.usersToolStripMenuItem.Size = new System.Drawing.Size(97, 20);
+            this.usersToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
             this.usersToolStripMenuItem.Text = "Пользователи";
             // 
             // addUserToolStripMenuItem
             // 
             this.addUserToolStripMenuItem.Name = "addUserToolStripMenuItem";
-            this.addUserToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            this.addUserToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.addUserToolStripMenuItem.Text = "Добавить пользователя";
             this.addUserToolStripMenuItem.Click += new System.EventHandler(this.addUserToolStripMenuItem_Click);
             // 
             // banUserToolStripMenuItem
             // 
             this.banUserToolStripMenuItem.Name = "banUserToolStripMenuItem";
-            this.banUserToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            this.banUserToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.banUserToolStripMenuItem.Text = "Заблокировать пользователя";
             this.banUserToolStripMenuItem.Click += new System.EventHandler(this.banUserToolStripMenuItem_Click);
             // 
@@ -164,13 +171,13 @@
             this.группыToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.AddGroupToolStripMenuItem});
             this.группыToolStripMenuItem.Name = "группыToolStripMenuItem";
-            this.группыToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.группыToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
             this.группыToolStripMenuItem.Text = "Группы";
             // 
             // AddGroupToolStripMenuItem
             // 
             this.AddGroupToolStripMenuItem.Name = "AddGroupToolStripMenuItem";
-            this.AddGroupToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.AddGroupToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.AddGroupToolStripMenuItem.Text = "Добавить группу";
             this.AddGroupToolStripMenuItem.Click += new System.EventHandler(this.AddGroupToolStripMenuItem_Click);
             // 
@@ -201,6 +208,27 @@
             this.lbl_name.Size = new System.Drawing.Size(10, 13);
             this.lbl_name.TabIndex = 13;
             this.lbl_name.Text = " ";
+            // 
+            // getFileToolStripMenuItem
+            // 
+            this.getFileToolStripMenuItem.Name = "getFileToolStripMenuItem";
+            this.getFileToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.getFileToolStripMenuItem.Text = "Получить файл";
+            this.getFileToolStripMenuItem.Click += new System.EventHandler(this.getFileToolStripMenuItem_Click);
+            // 
+            // logoutToolStripMenuItem
+            // 
+            this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
+            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.logoutToolStripMenuItem.Text = "Выйти из учётной записи";
+            this.logoutToolStripMenuItem.Click += new System.EventHandler(this.logoutToolStripMenuItem_Click);
+            // 
+            // changeRightsToolStripMenuItem
+            // 
+            this.changeRightsToolStripMenuItem.Name = "changeRightsToolStripMenuItem";
+            this.changeRightsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.changeRightsToolStripMenuItem.Text = "Изменить права";
+            this.changeRightsToolStripMenuItem.Click += new System.EventHandler(this.changeRightsToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -244,6 +272,9 @@
         private System.Windows.Forms.ToolStripMenuItem AddGroupToolStripMenuItem;
         private System.Windows.Forms.Label lbl_currUser;
         private System.Windows.Forms.Label lbl_name;
+        private System.Windows.Forms.ToolStripMenuItem getFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem logoutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changeRightsToolStripMenuItem;
     }
 }
 

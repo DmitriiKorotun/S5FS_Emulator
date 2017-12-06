@@ -165,6 +165,12 @@ namespace OSWPF1
             return arr.Length;
         }
 
+        public static long WriteOutputBlock(System.IO.FileStream fs, byte[] arr)
+        {
+            fs.Write(arr, 0, arr.Length);
+            return arr.Length;
+        }
+
         //Writes block to the fs starting from offset
         public static long WriteBlock(System.IO.FileStream fs, long offset, int blockSize, byte[] arr)
         {

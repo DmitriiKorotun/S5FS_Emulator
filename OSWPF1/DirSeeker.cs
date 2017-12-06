@@ -8,29 +8,108 @@ namespace OSWPF1
 {
     class DirSeeker
     {
-        public static System.Windows.Forms.TreeNode GetFileList(int nodeNum, int blockSize, string name)
+        private static bool IsOn(short rights, int byteNum, int bitNum)
+        {
+            var strRights = rights.ToString();
+            var right = strRights[byteNum];
+            return BitWorker.IsBitOn(Convert.ToByte(Char.GetNumericValue(right)), bitNum);
+        }
+
+        private static bool GetRightValue(SystemSigns.Signs entity, SystemSigns.Signs right, short rigths)
+        {
+            int bitNum = -1, byteNum = -1;
+            switch (entity)
+            {
+                case SystemSigns.Signs.USER:
+                    byteNum = 2;
+                    break;
+                case SystemSigns.Signs.GROUP:
+                    byteNum = 1;
+                    break;
+                case SystemSigns.Signs.OTHER:
+                    byteNum = 0;
+                    break;
+            }
+            switch (right)
+            {
+                case SystemSigns.Signs.READ:
+                    bitNum = 2;
+                    break;
+                case SystemSigns.Signs.WRITE:
+                    bitNum = 1;
+                    break;
+                case SystemSigns.Signs.EX:
+                    bitNum = 0;
+                    break;
+            }
+            return IsOn(rigths, byteNum, bitNum);
+        }
+
+        public static bool DoNeedToHide(INode node, short uid, short gid)
+        {
+            bool toHide = false;
+            if (node.Flag.Hidden)
+            {
+                if (node.UID == uid || node.GID == gid)
+                    toHide = false;
+                else
+                    toHide = true;
+            }
+            return toHide;    
+        }
+
+        public static bool IfCan(INode node, SystemSigns.Signs whatToDo, short uid, short gid)
+        {
+            bool ifCanDo;
+            if (node.UID == uid)
+                ifCanDo = GetRightValue(SystemSigns.Signs.USER, whatToDo, node.Rights);
+            else if (node.GID == gid)
+                ifCanDo = GetRightValue(SystemSigns.Signs.GROUP, whatToDo, node.Rights);
+            else
+                ifCanDo = GetRightValue(SystemSigns.Signs.OTHER, whatToDo, node.Rights);
+            return ifCanDo;
+        }
+
+        //public static System.Windows.Forms.TreeNode RemoveHidden(System.Windows.Forms.TreeNode tree, INode node,
+        //    short uid, short gid)
+        //{
+        //    if (node.Rights = )
+        //    foreach (System.Windows.Forms.TreeNode branch in tree.Nodes)
+        //    {
+
+        //    }
+        //}
+
+
+        public static System.Windows.Forms.TreeNode GetFileList(int nodeNum, int blockSize, string name,
+            short uid, short gid)
         {
             var tree = new System.Windows.Forms.TreeNode(name);
-
             using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
-                for (int i = 0; i < node.Di_addr.Length; ++i)
+                if (!DoNeedToHide(node, uid, gid))
                 {
-                    if (node.Di_addr[i] != 0)
+                    for (int i = 0; i < node.Di_addr.Length; ++i)
                     {
-                        var block = ByteReader.ReadBlock(fs, blockSize, OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR) +
-                            (node.Di_addr[i] - 1) * blockSize);
-                        for (int j = 0; j < block.Length - 20;
-                            j += OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR))
+                        if (node.Di_addr[i] != 0)
                         {
-                            var file = GetFile(block, j);
-                            if (file.NodeNum < 1)
-                                continue;
-                            if (file.Type)
-                                tree.Nodes.Add(GetFileList(file.NodeNum, blockSize, file.Name));
-                            else
-                                tree.Nodes.Add(file.Name);
+                            var block = ByteReader.ReadBlock(fs, blockSize, OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR) +
+                                (node.Di_addr[i] - 1) * blockSize);
+                            for (int j = 0; j < block.Length - 20;
+                                j += OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.FILEINDIR))
+                            {
+                                var file = GetFile(block, j);
+                                if (file.NodeNum < 1)
+                                    continue;
+                                if (!DoNeedToHide(DataExtractor.GetINode(fs, file.NodeNum), uid, gid))
+                                {
+                                    if (file.Type)
+                                        tree.Nodes.Add(GetFileList(file.NodeNum, blockSize, file.Name, uid, gid));
+                                    else
+                                        tree.Nodes.Add(file.Name);
+                                }
+                            }
                         }
                     }
                 }
@@ -40,14 +119,15 @@ namespace OSWPF1
 
 
 
-        public static System.Windows.Forms.TreeNode GetExtendedFileList(int nodeNum, int blockSize, string name)
+        public static System.Windows.Forms.TreeNode GetExtendedFileList(int nodeNum, int blockSize, string name,
+            short uid, short gid)
         {
             var tree = new System.Windows.Forms.TreeNode(GetTruncatedName(name));
-
             using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
                 tree.Text += AddPropToName(node);
+
                 for (int i = 0; i < node.Di_addr.Length; ++i)
                 {
                     if (node.Di_addr[i] != 0)
@@ -60,10 +140,14 @@ namespace OSWPF1
                             var file = GetFile(block, j);
                             if (file.NodeNum < 1)
                                 continue;
-                            if (file.Type)
-                                tree.Nodes.Add(GetExtendedFileList(file.NodeNum, blockSize, file.Name));
-                            else
-                                tree.Nodes.Add(GetTruncatedName(file.Name) + AddPropToName(DataExtractor.GetINode(fs, file.NodeNum)));
+                            if (!DoNeedToHide(DataExtractor.GetINode(fs, file.NodeNum), uid, gid))
+                            {
+                                if (file.Type)
+                                    tree.Nodes.Add(GetExtendedFileList(file.NodeNum, blockSize, file.Name, uid, gid));
+                                else
+                                    tree.Nodes.Add(GetTruncatedName(file.Name) +
+                                        AddPropToName(DataExtractor.GetINode(fs, file.NodeNum)));
+                            }
                         }
                     }
                 }
@@ -76,7 +160,19 @@ namespace OSWPF1
             return name.Replace("\0", "");
         }
 
-        public static string AddPropToName(INode node)
+        public static string GetNormalizedName(string name)
+        {
+            if (name.Contains(':'))
+            {
+                var index = name.IndexOf(':');
+                name = name.Remove(index - 1);
+            }
+            return name;
+        }
+
+
+
+    private static string AddPropToName(INode node)
         {
             var props = " : ";
             props += node.Flag.Type == true ? "d" : "f";
@@ -86,7 +182,7 @@ namespace OSWPF1
             return props;
         }
 
-        public static string GetRights(INode node)
+        private static string GetRights(INode node)
         {
             var str = "";
             var rights = node.Rights.ToString();
@@ -102,7 +198,7 @@ namespace OSWPF1
             return str;
         }
 
-        public static FileInDir GetFile(byte[] block, int startIndex)
+        private static FileInDir GetFile(byte[] block, int startIndex)
         {
             var file = new FileInDir();
             file.Name = Encoding.ASCII.GetString(block, startIndex, 16);
@@ -123,6 +219,10 @@ namespace OSWPF1
             else
             {
                 treeStack = GetNodes(tree);
+                if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+                {
+                    throw new System.IO.IOException();
+                }
                 using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
                     return GetCurrentFileNode(fs, treeStack, (short)SystemSigns.Signs.MAINDIRNODE, blockSize);
             }
@@ -191,10 +291,45 @@ namespace OSWPF1
 
         public static bool IsDir(System.Windows.Forms.TreeNode tree, int blockSize)
         {
+
             using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
                 if (DataExtractor.GetINode(fs, GetNeededFileNode(tree, blockSize)).Flag.Type)
                     return true;
             return false;
         }
+
+
+        public static int GetFileDirBlockNum(System.IO.FileStream fs, int blockSize, short dirNum, short fileNum)
+        {
+            var blockNum = -1;
+            var node = DataExtractor.GetINode(fs, dirNum);
+            for (var i = 0; i < node.Di_addr.Length; ++i)
+            {
+                if (node.Di_addr[i] == 0)
+                    continue;
+                if (GetFileDirOffset(BlocksHandler.GetBlock(fs, blockSize, node.Di_addr[i]), fileNum) < 0)
+                    continue;
+                blockNum = node.Di_addr[i];
+                break;
+            }
+            return blockNum;
+        }
+
+        public static int GetFileDirOffset(byte[] block, short fileNum)
+        {
+            var offset = -1;
+            for (int j = 16; j < block.Length / (int)OffsetHandbook.sizeGuide.FILEINDIR;
+                  j += (int)OffsetHandbook.sizeGuide.FILEINDIR)
+            {
+                var nodeNum = BitConverter.ToInt16(block, j);
+                if (nodeNum != fileNum)
+                    continue;
+                offset = j - 16;
+                break;
+            }
+            return offset;
+        }
     }
+
+
 }

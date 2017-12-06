@@ -40,8 +40,12 @@ namespace OSWPF1
             AddFile(new INode(SystemSigns.Signs.CREATEGROUPFILE), null, 1);
             AddFile(new INode(SystemSigns.Signs.CREATEUSERFILE), null, 1);
             AddFile(new INode(SystemSigns.Signs.CREATEBANNEDFILE), null, 1);
+
+
             GroupPolicy.WriteGroup("Admins");
+            GroupPolicy.WriteGroup("Users");
             GroupPolicy.WriteUser("Admin", "root", 1);
+            GroupPolicy.WriteUser("User", "root", 2);
         }
 
         public void AddFile(INode iNode, byte[] data, short dirNode)
@@ -62,7 +66,7 @@ namespace OSWPF1
 
         private short CompleteFileInfo(ref FileDataStorage storage, ref INode iNode, byte[] data, short[] blocks)
         {
-            if (iNode.Size / 1024 > 8240)
+            if (iNode.Size > 8437760)
                 throw new Exception("File size is too big");
             //Add exception for file is corrupted by checking size
 
@@ -89,6 +93,10 @@ namespace OSWPF1
 
         private void WriteFileInfo(FileDataStorage storage, INode iNode, string path, short nodeNum)
         {
+            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+            {
+                throw new System.IO.IOException();
+            }
             using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
             {
                 fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.BITMAP);
@@ -97,12 +105,15 @@ namespace OSWPF1
                 fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.INODES) +
                     OffsetHandbook.GetOffs(OffsetHandbook.sizeGuide.INODE) * (nodeNum - 1);
                 FSPartsWriter.WriteINode(fs, iNode);
-
             }
         }
 
         private void WriteFileBlocks(FileDataStorage storage, Dictionary<int, byte[]> data, string path)
         {
+            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+            {
+                throw new System.IO.IOException();
+            }
             var dataKeys = GetDataKeys(data);
             using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
             {
@@ -110,7 +121,7 @@ namespace OSWPF1
                 for (int i = 1; i <= storage.Bitmap.BitmapValue.Length * 8; ++i)
                 {
                     if (dataKeys.Contains(i))
-                        ByteWriter.WriteBlock(fs, 
+                        ByteWriter.WriteBlock(fs,
                             OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR) + (i - 1) * 4096, //Make 4096 dynamic
                             storage.Superblock.ClusterSize, data[i]);
                 }
@@ -137,6 +148,10 @@ namespace OSWPF1
 
         public static void DelFS()
         {
+            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+            {
+                throw new System.IO.IOException();
+            }
             var path = "FS";
             if (System.IO.File.Exists(path))
                 System.IO.File.Delete(path);

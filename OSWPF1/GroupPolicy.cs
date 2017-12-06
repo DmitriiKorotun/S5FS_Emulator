@@ -38,6 +38,22 @@ namespace OSWPF1
             return id;
         }
 
+        public static short GetUserGID(short uid)
+        {
+            var gid = -1;
+            var list = GetUserList();
+            foreach (KeyValuePair<short, string[]> pair in list)
+            {
+                if (pair.Key != uid)
+                    continue;
+                else
+                {
+                    gid = Int16.Parse(pair.Value[1]);
+                } 
+            }
+            return (short)gid;
+        }
+
         public static void WriteGroup(string name)
         {
             WriteUserGroup(name, null, -1, GetFreeGID(), (int)OffsetHandbook.sizeGuide.GROUP, 2);
