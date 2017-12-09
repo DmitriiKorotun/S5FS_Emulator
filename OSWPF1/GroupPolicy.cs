@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSWPF1
@@ -11,7 +12,13 @@ namespace OSWPF1
         private static int GetUserId(string login, bool isIdGid)
         {
             var id = -1;
-            using (System.IO.FileStream fs = System.IO.File.OpenWrite("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, 3);
                 for (int i = 0; i < node.Di_addr.Length; ++i)
@@ -66,7 +73,13 @@ namespace OSWPF1
 
         public static void WriteUserGroup(string name, string pass, short uid, short gid, int incr, int nodeNum)
         {
-            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
                 int freeBlock = -1;
@@ -125,7 +138,13 @@ namespace OSWPF1
         public static bool CheckLoginPass(string login, string pass)
         {
             var isOk = false;
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, 3);
                 for (int i = 0; i < node.Di_addr.Length; ++i)
@@ -153,7 +172,13 @@ namespace OSWPF1
         public static short GetFreeUID()
         {
             var id = 1;
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, 3);
                 for (int i = 0; i < node.Di_addr.Length; ++i)
@@ -181,7 +206,13 @@ namespace OSWPF1
         public static short GetFreeGID()
         {
             var id = 1;
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+                System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, 2);
                 for (int i = 0; i < node.Di_addr.Length; ++i)
@@ -209,7 +240,13 @@ namespace OSWPF1
         public static Dictionary<short, string> GetGroupList()
         {
             var list = new Dictionary<short, string>();
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, 2);
                 for (int i = 0; i < node.Di_addr.Length; ++i)
@@ -233,7 +270,13 @@ namespace OSWPF1
         public static Dictionary<short, string[]> GetUserList()
         {
             var list = new Dictionary<short, string[]>();
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, 3);
                 for (int i = 0; i < node.Di_addr.Length; ++i)
@@ -311,7 +354,13 @@ namespace OSWPF1
 
         private static void WriteBanned(short uid, int incr, int nodeNum)
         {
-            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
                 int freeBlock = -1;

@@ -12,30 +12,52 @@ namespace OSWPF1
 {
     class DiagTools
     {
-        public static bool IsFileLocked(FileInfo file)
+        public static bool IsFileLocked(FileInfo file, bool ToRead)
         {
             FileStream stream = null;
 
             try
             {
-                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+                if (ToRead)
+                    stream = file.OpenRead();
+                else
+                    stream = file.OpenWrite();
+             //   stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                 
             }
             catch (IOException)
             {
                 System.Threading.Thread.Sleep(3000);
                 try
                 {
-                    stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+                    if (ToRead)
+                        stream = file.OpenRead();
+                    else
+                        stream = file.OpenWrite();
+                    //stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                 }
                 catch (IOException)
                 {
-                    return true;
+                    System.Threading.Thread.Sleep(3000);
+                    try
+                    {
+                        if (ToRead)
+                            stream = file.OpenRead();
+                        else
+                            stream = file.OpenWrite();
+                        //stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                    }
+                    catch (IOException)
+                    {
+                        return true;
+                    }
+                    //the file is unavailable because it is:
+                    //still being written to
+                    //or being processed by another thread
+                    //or does not exist (has already been processed)
+                    return false;
                 }
-                //the file is unavailable because it is:
-                //still being written to
-                //or being processed by another thread
-                //or does not exist (has already been processed)
-                return false;  
+                return false;
             }
             finally
             {

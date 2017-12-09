@@ -87,7 +87,6 @@
     <Compile Include="DirSeeker.cs" />
     <Compile Include="FileInDir.cs" />
     <Compile Include="OSException.cs" />
-    <Compile Include="Explorer.cs" />
     <Compile Include="FileCleaner.cs" />
     <Compile Include="FileDataStorage.cs" />
     <Compile Include="FSHandler.cs" />

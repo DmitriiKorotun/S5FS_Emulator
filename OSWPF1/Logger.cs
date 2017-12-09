@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSWPF1
@@ -45,6 +46,7 @@ namespace OSWPF1
         void WriteToFile()
         {
             UnicodeEncoding unicode = new UnicodeEncoding();
+            Thread.Sleep(200);
             using (var logstream = System.IO.File.OpenWrite(Logpath))
             {
                 for (int i = 0; i < Logs.Count; ++i)

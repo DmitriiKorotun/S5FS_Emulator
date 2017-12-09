@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace OSWPF1
 {
@@ -32,11 +33,13 @@ namespace OSWPF1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-            {
-                throw new System.IO.IOException();
-            }
-            using (System.IO.FileStream fs = System.IO.File.OpenWrite("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
                 //node.

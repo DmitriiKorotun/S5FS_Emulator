@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSWPF1
@@ -10,11 +11,13 @@ namespace OSWPF1
     {
         public static void DelOneFile(FileDataStorage storage, int blockSize, int nodeNum, int dirNum, short uid, short gid)
         {
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-            {
-                throw new System.IO.IOException();
-            }
-            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
 
                 var node = DataExtractor.GetINode(fs, nodeNum);
@@ -55,20 +58,31 @@ namespace OSWPF1
         }
 
 
-        private static void DelFileInFolder(FileDataStorage storage, System.IO.FileStream fs, int nodeNum)
+        private static void DelFileInFolder(FileDataStorage storage, System.IO.FileStream fs, int dirNum, int nodeNum,
+            short uid, short gid)
         {
             var node = DataExtractor.GetINode(fs, nodeNum);
-            var bm = SetFileBlocksFree(fs, node, storage.Bitmap.BitmapValue, storage.Superblock.ClusterSize);
-            ByteWriter.WriteBlock(fs, (long)OffsetHandbook.posGuide.BITMAP, 4096, bm);
+            if (node.Flag.System)
+                throw new OSException.SystemDeleteException("Вы пытаетесь удалить системный файл");
+            if (DirSeeker.IfCan(node, SystemSigns.Signs.WRITE, uid, gid))
+            {
+                var bm = SetFileBlocksFree(fs, node, storage.Bitmap.BitmapValue, storage.Superblock.ClusterSize);
+                FSPartsWriter.WriteBitmap(fs, bm, storage.Superblock.ClusterSize);
+                ClearFolderFromFile(fs, 4096, (short)dirNum, (short)nodeNum);
+            }
+            else
+                throw new OSException.AccessException("У вас недостаточно прав для этой операции");
         }
 
-        public static void DelDir(FileDataStorage storage, int nodeNum, short uid, short gid)
+        public static void DelDir(FileDataStorage storage, int nodeNum, int dirNum, short uid, short gid)
         {
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-            {
-                throw new System.IO.IOException();
-            }
-            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
                 if (node.Flag.System)
@@ -85,21 +99,23 @@ namespace OSWPF1
                             {
                                 var fileNodeNum = BitConverter.ToInt16(block, j);
                                 var isDir = BitConverter.ToBoolean(block, j + 2);
+                                if (fileNodeNum == 0)
+                                    continue;
                                 if (isDir)
-                                    DelDir(storage, fileNodeNum, uid, gid);
+                                    DelDir(storage, nodeNum, fileNodeNum, uid, gid);
                                 else
-                                    DelFileInFolder(storage, fs, nodeNum);
+                                    DelFileInFolder(storage, fs, nodeNum, fileNodeNum, uid, gid);
                             }
                         }
-                        var bm = SetDirBlocksFree(fs, node.Di_addr, storage.Bitmap.BitmapValue);
-                        fs.Position = (long)OffsetHandbook.posGuide.BITMAP;
-                        FSPartsWriter.WriteBitmap(fs, bm, storage.Superblock.ClusterSize);
-                        // ByteWriter.WriteBlock(fs, (long)OffsetHandbook.posGuide.BITMAP, 4096, bm);
-                        var iMap = SetNodeFree(fs, storage.INodeMap.BitmapValue, nodeNum);
-                        fs.Position = (long)OffsetHandbook.posGuide.IMAP;
-                        FSPartsWriter.WriteBitmap(fs, iMap, storage.Superblock.ClusterSize);
-                        // ByteWriter.WriteBlock(fs, (long)OffsetHandbook.posGuide.IMAP, 4096, iMap);
                     }
+                    var bm = SetDirBlocksFree(fs, node.Di_addr, storage.Bitmap.BitmapValue);
+                    fs.Position = (long)OffsetHandbook.posGuide.BITMAP;
+                    FSPartsWriter.WriteBitmap(fs, bm, storage.Superblock.ClusterSize);
+
+                    var iMap = SetNodeFree(fs, storage.INodeMap.BitmapValue, nodeNum);
+                    fs.Position = (long)OffsetHandbook.posGuide.IMAP;
+                    FSPartsWriter.WriteBitmap(fs, iMap, storage.Superblock.ClusterSize);
+                    ClearFolderFromFile(fs, 4096, (short)dirNum, (short)nodeNum);
                 }
                 else
                     throw new OSException.AccessException("У вас недостаточно прав для этой операции");

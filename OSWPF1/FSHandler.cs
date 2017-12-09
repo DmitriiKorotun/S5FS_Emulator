@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSWPF1
@@ -23,7 +24,8 @@ namespace OSWPF1
         //After that it will fill the rest of the file with '0'
         void CreateMainFile(string filepath)
         {
-            using (var fs = System.IO.File.Create(filepath))
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Create,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 try
                 {
@@ -93,11 +95,13 @@ namespace OSWPF1
 
         private void WriteFileInfo(FileDataStorage storage, INode iNode, string path, short nodeNum)
         {
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-            {
-                throw new System.IO.IOException();
-            }
-            using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.BITMAP);
                 FSPartsWriter.WriteBitmap(fs, storage.Bitmap, storage.Superblock.ClusterSize);
@@ -110,12 +114,14 @@ namespace OSWPF1
 
         private void WriteFileBlocks(FileDataStorage storage, Dictionary<int, byte[]> data, string path)
         {
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-            {
-                throw new System.IO.IOException();
-            }
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
             var dataKeys = GetDataKeys(data);
-            using (System.IO.FileStream fs = System.IO.File.OpenWrite(path))
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 fs.Position = OffsetHandbook.GetPos(OffsetHandbook.posGuide.MAINDIR);
                 for (int i = 1; i <= storage.Bitmap.BitmapValue.Length * 8; ++i)
@@ -148,7 +154,7 @@ namespace OSWPF1
 
         public static void DelFS()
         {
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
+            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
             {
                 throw new System.IO.IOException();
             }

@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -245,8 +246,9 @@ namespace OSWPF1
             {
                 var storage = DataExtractor.GetData("FS");
                 var nodeNum = DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode, storage.Superblock.ClusterSize);
+                var parentDir = DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode.Parent, storage.Superblock.ClusterSize);
                 if (DirSeeker.IsDir(tv_dirView.SelectedNode, storage.Superblock.ClusterSize))
-                    FileCleaner.DelDir(storage, nodeNum, CurrUid, GroupPolicy.GetUserGID(currUid));
+                    FileCleaner.DelDir(storage, nodeNum, parentDir, CurrUid, GroupPolicy.GetUserGID(currUid));
                 else
                     FileCleaner.DelOneFile(storage, storage.Superblock.ClusterSize, nodeNum,
                         DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode.Parent, storage.Superblock.ClusterSize),
@@ -279,19 +281,22 @@ namespace OSWPF1
         {
             UpdateFSView(tv_dirView);
             var name = DirSeeker.GetTruncatedName(tv_dirView.SelectedNode.Text);
+            Thread.Sleep(200);
             using (System.IO.FileStream output = System.IO.File.OpenWrite(name))
             {
                 long bytesWritten = 0;
-                if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-                {
-                    throw new System.IO.IOException();
-                }
+                //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+                //{
+                //    throw new System.IO.IOException();
+                //}
                 var nodeNum = DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode, 4096);
-                if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-                {
-                    throw new System.IO.IOException();
-                }
-                using (System.IO.FileStream input = System.IO.File.Open("FS", System.IO.FileMode.Open))
+                //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+                //{
+                //    throw new System.IO.IOException();
+                //}
+                Thread.Sleep(200);
+                using (System.IO.FileStream input = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
                 {
                     var node = DataExtractor.GetINode(input, nodeNum);
                     if (DirSeeker.IfCan(node, SystemSigns.Signs.READ, currUid, GroupPolicy.GetUserGID(currUid)))
@@ -367,6 +372,12 @@ namespace OSWPF1
         private void changeRightsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             
+        }
+
+        private void изменитьФайлToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var add = new AddFile(DirSeeker.GetNeededFileNode(tv_dirView.SelectedNode, 4096), true);
+            add.ShowDialog(this);
         }
     }
 }

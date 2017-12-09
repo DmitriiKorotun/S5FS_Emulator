@@ -31,6 +31,41 @@ namespace OSWPF1
             check_aEx.Checked = true;
         }
 
+
+        public AddFile(short nodeNum, bool junk)
+        {
+            InitializeComponent();
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+                System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
+            {
+                var node = DataExtractor.GetINode(fs, nodeNum);
+                for (var i = 0; i < node.Di_addr.Length - 1; ++i)
+                {
+                    if (node.Di_addr[i] == 0)
+                        continue;
+                    var block = BlocksHandler.GetBlock(fs, 4096, node.Di_addr[i]);
+                    rtb_data.Text = Encoding.ASCII.GetString(block);
+                }
+                if (node.Size > 53248)
+                {
+                }
+                tb_name.Text = node.Name;
+            }
+                
+            //uid = id;
+            check_uRead.Checked = true;
+            check_uWrite.Checked = true;
+            check_uEx.Checked = true;
+
+            check_gRead.Checked = true;
+            check_gWrite.Checked = true;
+            check_gEx.Checked = true;
+
+            check_aRead.Checked = true;
+            check_aWrite.Checked = true;
+            check_aEx.Checked = true;
+        }
+
         private void btn_exit_Click(object sender, EventArgs e)
         {
             Close();

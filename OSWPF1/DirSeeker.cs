@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace OSWPF1
 {
@@ -21,13 +23,13 @@ namespace OSWPF1
             switch (entity)
             {
                 case SystemSigns.Signs.USER:
-                    byteNum = 2;
+                    byteNum = 0;
                     break;
                 case SystemSigns.Signs.GROUP:
                     byteNum = 1;
                     break;
                 case SystemSigns.Signs.OTHER:
-                    byteNum = 0;
+                    byteNum = 2;
                     break;
             }
             switch (right)
@@ -85,7 +87,13 @@ namespace OSWPF1
             short uid, short gid)
         {
             var tree = new System.Windows.Forms.TreeNode(name);
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
                 if (!DoNeedToHide(node, uid, gid))
@@ -123,7 +131,13 @@ namespace OSWPF1
             short uid, short gid)
         {
             var tree = new System.Windows.Forms.TreeNode(GetTruncatedName(name));
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, nodeNum);
                 tree.Text += AddPropToName(node);
@@ -219,11 +233,13 @@ namespace OSWPF1
             else
             {
                 treeStack = GetNodes(tree);
-                if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-                {
-                    throw new System.IO.IOException();
-                }
-                using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+                //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+                //{
+                //    throw new System.IO.IOException();
+                //}
+                Thread.Sleep(200);
+                using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
                     return GetCurrentFileNode(fs, treeStack, (short)SystemSigns.Signs.MAINDIRNODE, blockSize);
             }
         }
@@ -291,8 +307,13 @@ namespace OSWPF1
 
         public static bool IsDir(System.Windows.Forms.TreeNode tree, int blockSize)
         {
-
-            using (System.IO.FileStream fs = System.IO.File.OpenRead("FS"))
+            Thread.Sleep(200);
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), true))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+    System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
                 if (DataExtractor.GetINode(fs, GetNeededFileNode(tree, blockSize)).Flag.Type)
                     return true;
             return false;
@@ -330,6 +351,4 @@ namespace OSWPF1
             return offset;
         }
     }
-
-
 }

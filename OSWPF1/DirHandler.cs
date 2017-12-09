@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSWPF1
@@ -12,11 +13,13 @@ namespace OSWPF1
         {
             var storage = DataExtractor.GetData(path);
             var nodeNum = PrepDirData(ref iNode, ref storage, path);
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-            {
-                throw new System.IO.IOException();
-            }
-            using (System.IO.FileStream fs = System.IO.File.OpenWrite("FS"))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+                System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
                 WriteDir(fs, iNode, storage, nodeNum);
                 
             if (dirNode != (short)SystemSigns.Signs.CREATEMAINDIR)
@@ -63,11 +66,13 @@ namespace OSWPF1
 
         private static void PrepFileToDir(string name, int blockSize, short dirNode, short fileNode, bool type)
         {
-            if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS")))
-            {
-                throw new System.IO.IOException();
-            }
-            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open))
+            //if (DiagTools.IsFileLocked(new System.IO.FileInfo("FS"), false))
+            //{
+            //    throw new System.IO.IOException();
+            //}
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 var node = DataExtractor.GetINode(fs, dirNode);
                 if (!node.Flag.Type)

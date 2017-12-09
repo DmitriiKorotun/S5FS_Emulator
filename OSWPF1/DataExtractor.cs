@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSWPF1
@@ -72,7 +73,9 @@ namespace OSWPF1
         public static FileDataStorage GetData(string filepath)
         {
             var storage = new FileDataStorage();
-            using (var fs = System.IO.File.OpenRead(filepath))
+            Thread.Sleep(200);
+            using (System.IO.FileStream fs = System.IO.File.Open("FS", System.IO.FileMode.Open,
+System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite))
             {
                 storage.Superblock = GetSuperblock(storage.Superblock, fs);
                 fs.Seek(4096, System.IO.SeekOrigin.Begin); //Change offset to be dynamic

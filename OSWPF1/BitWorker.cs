@@ -36,7 +36,7 @@ namespace OSWPF1
             bool isOn;
             byte mask = (byte)(1 << bitNum);
             mask = (byte)~mask;
-            myByte &= mask;
+            myByte |= mask;
             if (myByte == 0)
                 isOn = false;
             else
